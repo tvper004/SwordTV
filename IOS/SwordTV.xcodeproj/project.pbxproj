@@ -12,6 +12,7 @@
 		A10000030000000000000003 /* PortalClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000030000000000000003 /* PortalClient.swift */; };
 		A10000040000000000000004 /* LocalEngineServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000040000000000000004 /* LocalEngineServer.swift */; };
 		A10000050000000000000005 /* Web in Resources */ = {isa = PBXBuildFile; fileRef = B10000050000000000000005 /* Web */; };
+		A10000060000000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10000070000000000000007 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		B10000040000000000000004 /* LocalEngineServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalEngineServer.swift; sourceTree = "<group>"; };
 		B10000050000000000000005 /* Web */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Web; sourceTree = "<group>"; };
 		B10000060000000000000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B10000070000000000000007 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +54,7 @@
 				B10000040000000000000004 /* LocalEngineServer.swift */,
 				B10000050000000000000005 /* Web */,
 				B10000060000000000000006 /* Info.plist */,
+				B10000070000000000000007 /* Assets.xcassets */,
 			);
 			path = SwordTV;
 			sourceTree = "<group>";
@@ -119,6 +122,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000050000000000000005 /* Web in Resources */,
+				A10000060000000000000006 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +171,7 @@
 		X10000030000000000000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGNING_REQUIRED = NO;
 				INFOPLIST_FILE = SwordTV/Info.plist;
@@ -182,6 +187,7 @@
 		X10000040000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGNING_REQUIRED = NO;
 				INFOPLIST_FILE = SwordTV/Info.plist;
