@@ -435,15 +435,28 @@ final class PortalClient {
         throw NSError(domain: "SwordTV", code: 502)
     }
 
+    private func imageOf(_ e: [String: Any], _ fileType: String) -> String {
+        for p in (e["posterList"] as? [[String: Any]] ?? []) {
+            if (p["fileType"] as? String) == fileType, let u = p["fileUrl"] as? String, !u.isEmpty {
+                return u.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+        return ""
+    }
+
     private func mapAsset(_ e: [String: Any], cat: String) -> [String: Any]? {
         guard let cid = e["contentId"] as? String, !cid.isEmpty else { return nil }
         let pType = e["programType"] as? String ?? "movie"
         let isSeries = pType == "teleplay" || pType == "series" || (e["volumnCount"] as? Int ?? 0) > 1
+        let poster = [imageOf(e, "poster"), imageOf(e, "thumbnail"), e["icon"] as? String ?? "", e["poster"] as? String ?? ""]
+            .first { !$0.isEmpty } ?? ""
+        let backdrop = [imageOf(e, "stage"), imageOf(e, "thumbnail"), e["stage"] as? String ?? "", poster]
+            .first { !$0.isEmpty } ?? ""
         return [
             "id": cid, "title": e["name"] ?? e["title"] ?? "", "alias": e["alias"] ?? "",
             "category": cat, "kind": isSeries ? "serie" : "película", "type": isSeries ? "teleplay" : pType,
             "score": e["score"] ?? "8.5", "year": String((e["releaseTime"] as? String ?? "2024").prefix(4)),
-            "poster": e["icon"] ?? e["poster"] ?? "", "backdrop": e["stage"] ?? e["poster"] ?? "",
+            "poster": poster, "backdrop": backdrop,
             "synopsis": e["description"] ?? "", "portal": true
         ]
     }

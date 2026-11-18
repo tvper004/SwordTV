@@ -3000,10 +3000,11 @@ async function autoResolveAndPlayVod(item, targetEp = null, startTime = 0, selec
           const sResp = await fetch(`http://127.0.0.1:11472/api/vod/search?q=${encodeURIComponent(cleanTitle)}`, { signal: session.controller.signal });
           const sData = await sResp.json();
           if (sData.ok && sData.items && sData.items.length > 0) {
-            const found = findExactTitleMatch(sData.items.filter(result =>
+            const sameKind = sData.items.filter(result =>
               !!(result.kind === 'serie' || result.type === 'teleplay' || result.type === 'series') === !!targetEp
-            ), cleanTitle, targetEp?.seasonNum || item.seasonNum || null);
-            if (!found) throw new Error('No se encontró una coincidencia exacta para este título.');
+            );
+            const found = findExactTitleMatch(sameKind, cleanTitle, targetEp?.seasonNum || item.seasonNum || null) || sameKind[0] || sData.items[0];
+            if (!found) throw new Error('No se encontró una coincidencia para este título.');
             let resolveId = found.id;
             let sid = '';
             if (found.kind === 'serie' || targetEp) {

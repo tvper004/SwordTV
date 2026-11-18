@@ -14,7 +14,16 @@ final class LocalEngineServer {
     private var listener: NWListener?
     private let queue = DispatchQueue(label: "com.swordtv.engine", attributes: .concurrent)
     private var tokens: [String: MediaTarget] = [:]
+    private var tokenOrder: [String] = []
     private let tokenLock = NSLock()
+    private let proxyDelegate = ProxySessionDelegate()
+    private lazy var proxySession: URLSession = {
+        let cfg = URLSessionConfiguration.ephemeral
+        cfg.timeoutIntervalForRequest = 15
+        cfg.waitsForConnectivity = true
+        cfg.httpMaximumConnectionsPerHost = 8
+        return URLSession(configuration: cfg, delegate: proxyDelegate, delegateQueue: nil)
+    }()
     private lazy var session: URLSession = {
         let cfg = URLSessionConfiguration.ephemeral
         cfg.timeoutIntervalForRequest = 20
@@ -59,11 +68,16 @@ final class LocalEngineServer {
     }
 
     private func registerMedia(url: String, headers: [String: String], channelCode: String? = nil) -> String {
-        let tok = UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased().prefix(24)
+        let tok = String(UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased().prefix(24))
         tokenLock.lock()
-        tokens[String(tok)] = MediaTarget(url: url, headers: headers, channelCode: channelCode)
+        tokens[tok] = MediaTarget(url: url, headers: headers, channelCode: channelCode)
+        tokenOrder.append(tok)
+        while tokenOrder.count > 128 {
+            let old = tokenOrder.removeFirst()
+            tokens.removeValue(forKey: old)
+        }
         tokenLock.unlock()
-        return String(tok)
+        return tok
     }
 
     private func handle(_ conn: NWConnection) {
@@ -206,7 +220,7 @@ final class LocalEngineServer {
         sendRaw(conn, status: 200, contentType: mime, body: data)
     }
 
-    private final class StreamRelayDelegate: NSObject, URLSessionDataDelegate {
+    private final class StreamRelayContext {
         let conn: NWConnection
         let isHlsCheckUrl: String
         let token: String
@@ -224,6 +238,25 @@ final class LocalEngineServer {
             self.token = token
             self.rewriteHls = rewriteHls
         }
+    }
+
+    private final class ProxySessionDelegate: NSObject, URLSessionDataDelegate {
+        private var contexts: [Int: StreamRelayContext] = [:]
+        private let lock = NSLock()
+
+        func register(taskId: Int, ctx: StreamRelayContext) {
+            lock.lock(); contexts[taskId] = ctx; lock.unlock()
+        }
+
+        private func get(_ taskId: Int) -> StreamRelayContext? {
+            lock.lock(); defer { lock.unlock() }
+            return contexts[taskId]
+        }
+
+        private func pop(_ taskId: Int) -> StreamRelayContext? {
+            lock.lock(); defer { lock.unlock() }
+            return contexts.removeValue(forKey: taskId)
+        }
 
         func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
             completionHandler(request)
@@ -239,53 +272,55 @@ final class LocalEngineServer {
         }
 
         func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+            guard let ctx = get(dataTask.taskIdentifier) else { completionHandler(.cancel); return }
             let http = response as? HTTPURLResponse
-            statusCode = http?.statusCode ?? 200
-            contentType = (http?.value(forHTTPHeaderField: "Content-Type") ?? "video/mp2t").lowercased()
-            responseUrl = response.url ?? URL(string: isHlsCheckUrl)
-            isHls = contentType.contains("mpegurl") || isHlsCheckUrl.lowercased().contains(".m3u8")
+            ctx.statusCode = http?.statusCode ?? 200
+            ctx.contentType = (http?.value(forHTTPHeaderField: "Content-Type") ?? "video/mp2t").lowercased()
+            ctx.responseUrl = response.url ?? URL(string: ctx.isHlsCheckUrl)
+            ctx.isHls = ctx.contentType.contains("mpegurl") || ctx.isHlsCheckUrl.lowercased().contains(".m3u8")
 
-            if !isHls {
-                var hdr = "HTTP/1.1 \(statusCode) OK\r\nContent-Type: \(contentType)\r\n"
+            if !ctx.isHls {
+                var hdr = "HTTP/1.1 \(ctx.statusCode) OK\r\nContent-Type: \(ctx.contentType)\r\n"
                 if let cl = http?.value(forHTTPHeaderField: "Content-Length") { hdr += "Content-Length: \(cl)\r\n" }
                 if let cr = http?.value(forHTTPHeaderField: "Content-Range") { hdr += "Content-Range: \(cr)\r\n" }
                 hdr += "Accept-Ranges: bytes\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: GET, HEAD, POST, OPTIONS\r\nAccess-Control-Allow-Headers: *\r\nConnection: close\r\n\r\n"
-                headersSent = true
-                conn.send(content: Data(hdr.utf8), completion: .contentProcessed { _ in })
+                ctx.headersSent = true
+                ctx.conn.send(content: Data(hdr.utf8), completion: .contentProcessed { _ in })
             }
             completionHandler(.allow)
         }
 
         func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-            if isHls {
-                hlsBuffer.append(data)
+            guard let ctx = get(dataTask.taskIdentifier) else { return }
+            if ctx.isHls {
+                ctx.hlsBuffer.append(data)
             } else {
-                conn.send(content: data, completion: .contentProcessed { _ in })
+                ctx.conn.send(content: data, completion: .contentProcessed { _ in })
             }
         }
 
         func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-            if isHls {
-                let raw = String(data: hlsBuffer, encoding: .utf8) ?? ""
-                if error != nil || statusCode >= 400 || raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            guard let ctx = pop(task.taskIdentifier) else { return }
+            if ctx.isHls {
+                let raw = String(data: ctx.hlsBuffer, encoding: .utf8) ?? ""
+                if error != nil || ctx.statusCode >= 400 || raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     let hdr = "HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\nConnection: close\r\n\r\n"
-                    conn.send(content: Data(hdr.utf8), completion: .contentProcessed { _ in self.conn.cancel() })
+                    ctx.conn.send(content: Data(hdr.utf8), completion: .contentProcessed { _ in ctx.conn.cancel() })
                 } else {
-                    let body = Data(rewriteHls(raw, token, responseUrl ?? URL(string: isHlsCheckUrl)!).utf8)
-                    let hdr = "HTTP/1.1 \(statusCode) OK\r\nContent-Type: application/vnd.apple.mpegurl\r\nContent-Length: \(body.count)\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\nConnection: close\r\n\r\n"
+                    let body = Data(ctx.rewriteHls(raw, ctx.token, ctx.responseUrl ?? URL(string: ctx.isHlsCheckUrl)!).utf8)
+                    let hdr = "HTTP/1.1 \(ctx.statusCode) OK\r\nContent-Type: application/vnd.apple.mpegurl\r\nContent-Length: \(body.count)\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\nConnection: close\r\n\r\n"
                     var payload = Data(hdr.utf8)
                     payload.append(body)
-                    conn.send(content: payload, completion: .contentProcessed { _ in self.conn.cancel() })
+                    ctx.conn.send(content: payload, completion: .contentProcessed { _ in ctx.conn.cancel() })
                 }
             } else {
-                if !headersSent {
+                if !ctx.headersSent {
                     let hdr = "HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n"
-                    conn.send(content: Data(hdr.utf8), completion: .contentProcessed { _ in self.conn.cancel() })
+                    ctx.conn.send(content: Data(hdr.utf8), completion: .contentProcessed { _ in ctx.conn.cancel() })
                 } else {
-                    conn.send(content: nil, isComplete: true, completion: .contentProcessed { _ in self.conn.cancel() })
+                    ctx.conn.send(content: nil, isComplete: true, completion: .contentProcessed { _ in ctx.conn.cancel() })
                 }
             }
-            session.finishTasksAndInvalidate()
         }
     }
 
@@ -368,12 +403,9 @@ final class LocalEngineServer {
         req.httpMethod = method == "HEAD" ? "HEAD" : "GET"
         headers.forEach { req.setValue($1, forHTTPHeaderField: $0) }
         if let range { req.setValue(range, forHTTPHeaderField: "Range") }
-        let delegate = StreamRelayDelegate(conn: conn, urlStr: urlStr, token: token, rewriteHls: self.rewriteHls)
-        let cfg = URLSessionConfiguration.ephemeral
-        cfg.timeoutIntervalForRequest = 15
-        cfg.waitsForConnectivity = true
-        let streamSession = URLSession(configuration: cfg, delegate: delegate, delegateQueue: nil)
-        let task = streamSession.dataTask(with: req)
+        let ctx = StreamRelayContext(conn: conn, urlStr: urlStr, token: token, rewriteHls: self.rewriteHls)
+        let task = proxySession.dataTask(with: req)
+        proxyDelegate.register(taskId: task.taskIdentifier, ctx: ctx)
         conn.stateUpdateHandler = { state in
             if case .cancelled = state { task.cancel() }
         }

@@ -555,11 +555,27 @@ class PortalClient {
         throw IllegalStateException("No VOD CDN available")
     }
 
+    private fun imageOf(e: JSONObject, fileType: String): String {
+        val arr = e.optJSONArray("posterList") ?: return ""
+        for (i in 0 until arr.length()) {
+            val p = arr.optJSONObject(i) ?: continue
+            if (p.optString("fileType") == fileType) {
+                val u = p.optString("fileUrl").trim()
+                if (u.isNotEmpty()) return u
+            }
+        }
+        return ""
+    }
+
     private fun mapAsset(e: JSONObject, cat: String): JSONObject? {
         val cid = e.optString("contentId").trim()
         if (cid.isEmpty()) return null
         val pType = e.optString("programType", "movie")
         val isSeries = pType == "teleplay" || pType == "series" || e.optInt("volumnCount", 0) > 1
+        val poster = imageOf(e, "poster").ifEmpty { imageOf(e, "thumbnail") }
+            .ifEmpty { e.optString("icon", e.optString("poster")) }
+        val backdrop = imageOf(e, "stage").ifEmpty { imageOf(e, "thumbnail") }
+            .ifEmpty { e.optString("stage", poster) }
         return JSONObject().apply {
             put("id", cid)
             put("title", e.optString("name", e.optString("title")))
@@ -569,8 +585,8 @@ class PortalClient {
             put("type", if (isSeries) "teleplay" else pType)
             put("score", e.optString("score", "8.5"))
             put("year", e.optString("releaseTime", "2024").take(4))
-            put("poster", e.optString("icon", e.optString("poster")))
-            put("backdrop", e.optString("stage", e.optString("poster")))
+            put("poster", poster)
+            put("backdrop", backdrop)
             put("synopsis", e.optString("description", ""))
             put("portal", true)
         }
