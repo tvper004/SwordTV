@@ -3018,6 +3018,36 @@ html.player-fullscreen .vod-subtitles-display {
   text-shadow: 0 2px 6px rgba(0,0,0,0.9);
 }
 
+.video-player-container.is-fullscreen-box {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  z-index: 9999 !important;
+  background: #000000 !important;
+  aspect-ratio: auto !important;
+}
+
+#view-live.sidebar-collapsed .live-channels-sidebar {
+  display: none !important;
+}
+
+.mobile-channels-toggle-btn {
+  display: none;
+  background: rgba(14, 165, 233, 0.18);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* ==========================================================================
    RESPONSIVE MOBILE & TABLET LAYOUT (Android / iOS)
    ========================================================================== */
@@ -3051,12 +3081,18 @@ html.player-fullscreen .vod-subtitles-display {
   }
   .now-playing-banner {
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 12px !important;
+    gap: 8px;
+    padding: 8px 12px !important;
   }
   .now-playing-tags {
     width: 100%;
     flex-wrap: wrap;
+    align-items: center;
+  }
+  .mobile-channels-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
   }
   .nav-two-rows {
     padding: 6px 10px;
@@ -3081,18 +3117,36 @@ html.player-fullscreen .vod-subtitles-display {
   }
   #view-live.view-container.active {
     flex-direction: column-reverse;
-    gap: 10px;
+    gap: 8px;
     padding: 8px;
   }
   .live-channels-sidebar {
     width: 100% !important;
     max-width: none !important;
-    height: 46vh;
+    flex: 1 1 0%;
+    min-height: 160px;
+    height: auto !important;
   }
   .live-player-pane {
     width: 100%;
+    flex: 0 0 auto;
     height: auto;
-    min-height: 220px;
+    gap: 8px;
+  }
+  #live-player-box:not(.is-fullscreen-box) {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 215px;
+    flex: none;
+  }
+  #view-live.sidebar-collapsed .live-player-pane {
+    flex: 1 1 0%;
+    height: 100%;
+  }
+  #view-live.sidebar-collapsed #live-player-box:not(.is-fullscreen-box) {
+    flex: 1;
+    aspect-ratio: auto;
+    min-height: 300px;
   }
   .vod-grid {
     grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)) !important;

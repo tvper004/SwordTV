@@ -1326,6 +1326,40 @@ function updateOsdFavButton() {
   btn.classList.toggle('is-fav', isFav);
 }
 
+async function toggleElementFullscreen(targetEl) {
+  if (!targetEl) return;
+  const isBoxFs = targetEl.classList.contains('is-fullscreen-box');
+  const docFs = document.fullscreenElement || document.webkitFullscreenElement;
+  if (docFs || isBoxFs) {
+    if (document.exitFullscreen) await document.exitFullscreen().catch(() => {});
+    else if (document.webkitExitFullscreen) await document.webkitExitFullscreen().catch(() => {});
+    targetEl.classList.remove('is-fullscreen-box');
+    document.documentElement.classList.remove('player-fullscreen');
+    if (state.windowFullscreen || /Android/i.test(navigator.userAgent)) {
+      await toggleFullscreen().catch(() => {});
+    }
+    return;
+  }
+
+  const reqFs = targetEl.requestFullscreen || targetEl.webkitRequestFullscreen;
+  const isTouchMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isTouchMobile || typeof reqFs !== 'function') {
+    targetEl.classList.add('is-fullscreen-box');
+    document.documentElement.classList.add('player-fullscreen');
+    if (/Android/i.test(navigator.userAgent)) {
+      invoke('toggle_fullscreen').catch(() => {});
+    }
+    return;
+  }
+
+  try {
+    await reqFs.call(targetEl);
+  } catch (_) {
+    targetEl.classList.add('is-fullscreen-box');
+    await toggleFullscreen().catch(() => {});
+  }
+}
+
 // Live OSD Controls Behavior
 function setupVideoPlayers() {
   const liveVideo = document.getElementById('live-video');
@@ -1407,11 +1441,7 @@ function setupVideoPlayers() {
   });
   livePlayerBox?.addEventListener('dblclick', (e) => {
     if (e.target.closest('.player-osd') || e.target.closest('.floating-ctrl-btn')) return;
-    if (!document.fullscreenElement) {
-      livePlayerBox.requestFullscreen().catch(() => toggleFullscreen());
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
+    toggleElementFullscreen(livePlayerBox);
   });
 
   livePlayBtn?.addEventListener('click', () => {
@@ -1446,12 +1476,7 @@ function setupVideoPlayers() {
   });
 
   liveFsBtn?.addEventListener('click', () => {
-    const box = document.getElementById('live-player-box');
-    if (!document.fullscreenElement) {
-      box.requestFullscreen().catch(() => toggleFullscreen());
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
+    toggleElementFullscreen(document.getElementById('live-player-box'));
   });
 
   livePipBtn?.addEventListener('click', async () => {
@@ -1508,22 +1533,19 @@ function setupVideoPlayers() {
   });
 
   floatFsBtn?.addEventListener('click', () => {
-    const box = document.getElementById('live-player-box');
-    if (!document.fullscreenElement) {
-      box.requestFullscreen().catch(() => toggleFullscreen());
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
+    toggleElementFullscreen(document.getElementById('live-player-box'));
   });
 
-  floatSidebarBtn?.addEventListener('click', () => {
-    const sidebar = document.querySelector('.live-channels-sidebar');
-    if (sidebar) {
-      const isHidden = sidebar.style.display === 'none';
-      sidebar.style.display = isHidden ? 'flex' : 'none';
-      floatSidebarBtn.textContent = isHidden ? '◫' : '◻';
-    }
-  });
+  const mobileSidebarBtn = document.getElementById('mobile-channels-toggle-btn');
+  const toggleLiveSidebar = () => {
+    const viewLive = document.getElementById('view-live');
+    if (!viewLive) return;
+    const collapsed = viewLive.classList.toggle('sidebar-collapsed');
+    if (floatSidebarBtn) floatSidebarBtn.textContent = collapsed ? '◻' : '◫';
+    if (mobileSidebarBtn) mobileSidebarBtn.textContent = collapsed ? '📺 Mostrar canales ▴' : '📺 Ocultar canales ▾';
+  };
+  floatSidebarBtn?.addEventListener('click', toggleLiveSidebar);
+  mobileSidebarBtn?.addEventListener('click', toggleLiveSidebar);
 
   // Rewind / Forward 10s
   document.getElementById('live-rewind-10')?.addEventListener('click', () => {
@@ -4382,11 +4404,7 @@ function setupVodPlayer() {
   });
 
   fsBtn?.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      overlay.requestFullscreen().catch(() => toggleFullscreen());
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
+    toggleElementFullscreen(overlay);
   });
 
   pipBtn?.addEventListener('click', async () => {
