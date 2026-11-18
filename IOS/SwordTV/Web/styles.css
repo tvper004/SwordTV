@@ -3036,6 +3036,7 @@ html.player-fullscreen .vod-subtitles-display {
   display: none !important;
 }
 
+.mobile-nav-toggle-btn,
 .mobile-channels-toggle-btn {
   display: none;
   background: rgba(14, 165, 233, 0.18);
@@ -3058,41 +3059,72 @@ html.player-fullscreen .vod-subtitles-display {
   }
   .app-topbar {
     height: auto !important;
-    min-height: 54px;
-    padding: 8px 12px !important;
+    min-height: 46px;
+    padding: 6px 10px !important;
     gap: 8px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap !important;
+    align-items: center;
+  }
+  .brand-section {
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+  .brand-logo-container {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .brand-title {
+    font-size: 16px !important;
   }
   .topbar-drag-handle {
     display: none;
   }
   .header-actions {
-    width: 100%;
-    justify-content: space-between;
-    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    justify-content: flex-end;
+    gap: 6px;
   }
   .search-box {
     flex: 1;
     min-width: 0;
     max-width: none !important;
+    padding: 5px 10px !important;
   }
-  .clock-display {
-    display: none;
-  }
-  .now-playing-banner {
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 8px 12px !important;
-  }
-  .now-playing-tags {
+  .search-input {
+    font-size: 13px !important;
     width: 100%;
-    flex-wrap: wrap;
-    align-items: center;
   }
-  .mobile-channels-toggle-btn {
+  .clock-display,
+  #btn-notification {
+    display: none !important;
+  }
+  #btn-sync-catalog {
+    padding: 6px 10px !important;
+    min-width: 34px;
+    justify-content: center;
+  }
+  #btn-sync-catalog .sync-label {
+    display: none !important;
+  }
+  .mobile-nav-toggle-btn {
     display: inline-flex;
     align-items: center;
-    margin-left: auto;
+    justify-content: center;
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 10px;
+    flex: 0 0 auto;
+  }
+  body.mobile-nav-collapsed #nav-categories-container {
+    display: none !important;
+  }
+  #now-playing-banner {
+    display: none !important;
+  }
+  #live-subnav-container.subnav-collapsed {
+    display: none !important;
   }
   .nav-two-rows {
     padding: 6px 10px;

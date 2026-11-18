@@ -461,6 +461,14 @@ function setupNavigation() {
     toggleFullscreen();
   });
 
+  // Mobile collapsible top category panel (starts collapsed on mobile for maximum space)
+  if (window.innerWidth <= 900) {
+    document.body.classList.add('mobile-nav-collapsed');
+  }
+  document.getElementById('mobile-nav-toggle-btn')?.addEventListener('click', () => {
+    document.body.classList.toggle('mobile-nav-collapsed');
+  });
+
   updateFavCounterBadge();
 }
 
@@ -491,6 +499,7 @@ function updateFavCounterBadge() {
 // Switch Main Category View
 function switchCategory(catId, targetChannel = null) {
   logAppAction('NAV_TAB_CHANGED', { tab: catId }, 'NAV');
+  if (window.innerWidth <= 900) document.body.classList.add('mobile-nav-collapsed');
   // If VOD player is open, close it cleanly
   const overlay = document.getElementById('vod-player-overlay');
   if (overlay && (overlay.classList.contains('open') || overlay.classList.contains('active'))) {
@@ -757,11 +766,17 @@ function setupLiveSection() {
     renderLiveChannels();
   });
 
-  // Category toggle button (≡)
+  // Category toggle button (≡) — starts collapsed on mobile to maximize channel list space
   const catToggle = document.getElementById('channel-cat-toggle-btn');
   const subnavEl = document.getElementById('live-subnav-container');
+  if (subnavEl && window.innerWidth <= 900) {
+    subnavEl.classList.add('subnav-collapsed');
+  }
   catToggle?.addEventListener('click', () => {
-    if (subnavEl) {
+    if (!subnavEl) return;
+    if (window.innerWidth <= 900) {
+      subnavEl.classList.toggle('subnav-collapsed');
+    } else {
       const isHidden = subnavEl.style.display === 'none';
       subnavEl.style.display = isHidden ? 'flex' : 'none';
     }
