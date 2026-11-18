@@ -400,7 +400,9 @@ final class PortalClient {
                 tracks.append(m)
             }
         }
-        guard let track = tracks.first else {
+        guard let track = tracks.first(where: { ($0["videoFormat"] as? String ?? "").lowercased() == "mp4" })
+            ?? tracks.first(where: { ($0["encodeFormat"] as? String ?? "").lowercased().contains("264") })
+            ?? tracks.first else {
             throw NSError(domain: "SwordTV", code: 404, userInfo: [NSLocalizedDescriptionKey: "Sin pistas de video"])
         }
         let lic = ((track["licenseList"] as? [[String: Any]])?.first?["license"] as? String) ?? ""

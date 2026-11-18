@@ -172,6 +172,13 @@ final class LocalEngineServer {
                     tokenLock.lock(); let target = tokens[tok]; tokenLock.unlock()
                     guard let target else { sendRaw(conn, status: 404, contentType: "text/plain", body: Data("expired".utf8)); return }
                     serveVodHls(conn, token: tok, target: target)
+                } else if path.hasPrefix("/vod-fmp4/") {
+                    let parts = path.dropFirst(10).split(separator: "/", maxSplits: 1)
+                    let tok = String(parts.first ?? "")
+                    let file = String(parts.last ?? "")
+                    tokenLock.lock(); let target = tokens[tok]; tokenLock.unlock()
+                    guard let target else { sendRaw(conn, status: 404, contentType: "text/plain", body: Data("expired".utf8)); return }
+                    serveVodFmp4(conn, token: tok, file: file, target: target)
                 } else if path.hasPrefix("/media/") {
                     let tok = String(path.dropFirst(7).split(separator: "/").first ?? "")
                     tokenLock.lock(); let target = tokens[tok]; tokenLock.unlock()
@@ -355,6 +362,8 @@ final class LocalEngineServer {
         return (machine, "Apple Silicon (VideoToolbox)")
     }
 
+    private var vodMetaCache: [String: (total: Int64, audioRate: Int, initData: Data?)] = [:]
+
     private func serveVodHls(_ conn: NWConnection, token: String, target: MediaTarget) {
         guard let url = URL(string: target.url) else {
             sendRaw(conn, status: 400, contentType: "text/plain", body: Data("bad url".utf8))
@@ -380,21 +389,88 @@ final class LocalEngineServer {
                 self.sendRaw(conn, status: 502, contentType: "text/plain", body: Data("no content length".utf8))
                 return
             }
+            self.tokenLock.lock()
+            let existing = self.vodMetaCache[token]
+            self.vodMetaCache[token] = (total, existing?.audioRate ?? 48000, existing?.initData)
+            self.tokenLock.unlock()
+
             let chunk: Int64 = 188 * 10000 // 1.88 MB aligned to 188-byte MPEG-TS packets
-            let segUrl = "http://127.0.0.1:\(self.port)/media/\(token)/stream.ts"
-            var lines = ["#EXTM3U", "#EXT-X-VERSION:4", "#EXT-X-TARGETDURATION:10", "#EXT-X-MEDIA-SEQUENCE:0", "#EXT-X-PLAYLIST-TYPE:VOD"]
-            var offset: Int64 = 0
-            while offset < total {
-                let len = min(chunk, total - offset)
+            let segCount = Int((total + chunk - 1) / chunk)
+            var lines = [
+                "#EXTM3U",
+                "#EXT-X-VERSION:7",
+                "#EXT-X-TARGETDURATION:10",
+                "#EXT-X-MEDIA-SEQUENCE:0",
+                "#EXT-X-PLAYLIST-TYPE:VOD",
+                "#EXT-X-MAP:URI=\"http://127.0.0.1:\(self.port)/vod-fmp4/\(token)/init.mp4\""
+            ]
+            for i in 0..<segCount {
                 lines.append("#EXTINF:8.000,")
-                lines.append("#EXT-X-BYTERANGE:\(len)@\(offset)")
-                lines.append(segUrl)
-                offset += len
+                lines.append("http://127.0.0.1:\(self.port)/vod-fmp4/\(token)/seg_\(i).m4s")
             }
             lines.append("#EXT-X-ENDLIST")
             let m3u8 = lines.joined(separator: "\n") + "\n"
             self.sendRaw(conn, status: 200, contentType: "application/vnd.apple.mpegurl", body: Data(m3u8.utf8))
         }.resume()
+    }
+
+    private func serveVodFmp4(_ conn: NWConnection, token: String, file: String, target: MediaTarget) {
+        guard let url = URL(string: target.url) else {
+            sendRaw(conn, status: 400, contentType: "text/plain", body: Data())
+            return
+        }
+        let chunk: Int64 = 188 * 10000
+        if file == "init.mp4" {
+            tokenLock.lock(); let cachedInit = vodMetaCache[token]?.initData; tokenLock.unlock()
+            if let cachedInit {
+                sendRaw(conn, status: 200, contentType: "video/mp4", body: cachedInit)
+                return
+            }
+            var req = URLRequest(url: url, timeoutInterval: 20)
+            req.setValue("bytes=0-\(chunk - 1)", forHTTPHeaderField: "Range")
+            target.headers.forEach { req.setValue($1, forHTTPHeaderField: $0) }
+            session.dataTask(with: req) { data, _, _ in
+                guard let data, !data.isEmpty else {
+                    self.sendRaw(conn, status: 502, contentType: "text/plain", body: Data())
+                    return
+                }
+                let parsed = TsToFmp4Remuxer.parseTS(data)
+                let initSeg = TsToFmp4Remuxer.buildInitSegment(video: parsed.videoConfig, audio: parsed.audioConfig)
+                let sr = parsed.audioConfig?.sampleRate ?? 48000
+                self.tokenLock.lock()
+                let prev = self.vodMetaCache[token]
+                self.vodMetaCache[token] = (prev?.total ?? 0, sr, initSeg)
+                self.tokenLock.unlock()
+                self.sendRaw(conn, status: 200, contentType: "video/mp4", body: initSeg)
+            }.resume()
+            return
+        }
+
+        if file.hasPrefix("seg_"), let idx = Int(file.dropFirst(4).split(separator: ".").first ?? "") {
+            tokenLock.lock(); let meta = vodMetaCache[token]; tokenLock.unlock()
+            let total = meta?.total ?? Int64.max
+            let start = Int64(idx) * chunk
+            guard start < total else {
+                sendRaw(conn, status: 404, contentType: "text/plain", body: Data())
+                return
+            }
+            let end = min(start + chunk - 1, total - 1)
+            var req = URLRequest(url: url, timeoutInterval: 25)
+            req.setValue("bytes=\(start)-\(end)", forHTTPHeaderField: "Range")
+            target.headers.forEach { req.setValue($1, forHTTPHeaderField: $0) }
+            session.dataTask(with: req) { data, _, _ in
+                guard let data, !data.isEmpty else {
+                    self.sendRaw(conn, status: 502, contentType: "text/plain", body: Data())
+                    return
+                }
+                let parsed = TsToFmp4Remuxer.parseTS(data)
+                let sr = meta?.audioRate ?? parsed.audioConfig?.sampleRate ?? 48000
+                let seg = TsToFmp4Remuxer.buildMediaSegment(seq: UInt32(idx + 1), parsed: parsed, audioSampleRate: sr)
+                self.sendRaw(conn, status: 200, contentType: "video/iso.segment", body: seg)
+            }.resume()
+            return
+        }
+        sendRaw(conn, status: 404, contentType: "text/plain", body: Data())
     }
 
     private func proxyMedia(_ conn: NWConnection, method: String, urlStr: String, headers: [String: String], range: String?, token: String) {

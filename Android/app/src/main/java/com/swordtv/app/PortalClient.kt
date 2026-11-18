@@ -504,7 +504,10 @@ class PortalClient {
                 if (m.optString("contentId").isNotEmpty()) tracks.add(m)
             }
         }
-        val track = tracks.firstOrNull() ?: throw IllegalStateException("Sin pistas de video")
+        val track = tracks.firstOrNull { it.optString("videoFormat").equals("mp4", true) }
+            ?: tracks.firstOrNull { it.optString("encodeFormat").lowercase().contains("264") }
+            ?: tracks.firstOrNull()
+            ?: throw IllegalStateException("Sin pistas de video")
         val lic = track.optJSONArray("licenseList")?.optJSONObject(0)?.optString("license") ?: ""
         val slb = slbCache?.takeIf { System.currentTimeMillis() - it.first < 300_000 }?.second
             ?: postPortal("v14/getSlbInfo", slbBean()).also {

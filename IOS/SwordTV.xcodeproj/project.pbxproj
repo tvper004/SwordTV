@@ -11,6 +11,7 @@
 		A10000020000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000002 /* ContentView.swift */; };
 		A10000030000000000000003 /* PortalClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000030000000000000003 /* PortalClient.swift */; };
 		A10000040000000000000004 /* LocalEngineServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000040000000000000004 /* LocalEngineServer.swift */; };
+		A10000080000000000000008 /* TsToFmp4Remuxer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000080000000000000008 /* TsToFmp4Remuxer.swift */; };
 		A10000050000000000000005 /* Web in Resources */ = {isa = PBXBuildFile; fileRef = B10000050000000000000005 /* Web */; };
 		A10000060000000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10000070000000000000007 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -21,6 +22,7 @@
 		B10000020000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B10000030000000000000003 /* PortalClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalClient.swift; sourceTree = "<group>"; };
 		B10000040000000000000004 /* LocalEngineServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalEngineServer.swift; sourceTree = "<group>"; };
+		B10000080000000000000008 /* TsToFmp4Remuxer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TsToFmp4Remuxer.swift; sourceTree = "<group>"; };
 		B10000050000000000000005 /* Web */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Web; sourceTree = "<group>"; };
 		B10000060000000000000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B10000070000000000000007 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -52,6 +54,7 @@
 				B10000020000000000000002 /* ContentView.swift */,
 				B10000030000000000000003 /* PortalClient.swift */,
 				B10000040000000000000004 /* LocalEngineServer.swift */,
+				B10000080000000000000008 /* TsToFmp4Remuxer.swift */,
 				B10000050000000000000005 /* Web */,
 				B10000060000000000000006 /* Info.plist */,
 				B10000070000000000000007 /* Assets.xcassets */,
@@ -137,6 +140,7 @@
 				A10000020000000000000002 /* ContentView.swift in Sources */,
 				A10000030000000000000003 /* PortalClient.swift in Sources */,
 				A10000040000000000000004 /* LocalEngineServer.swift in Sources */,
+				A10000080000000000000008 /* TsToFmp4Remuxer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2993,17 +2993,25 @@ async function autoResolveAndPlayVod(item, targetEp = null, startTime = 0, selec
       let portalFoundStream = null;
       try {
         const cleanTitle = (item.title || '').replace(/\s*\(\d{4}\).*$/, '').replace(/\s*-\s*T\d+:E\d+.*$/, '').trim();
-        if (cleanTitle) {
+        const origTitle = (item.originalTitle || '').replace(/\s*\(\d{4}\).*$/, '').replace(/\s*-\s*T\d+:E\d+.*$/, '').trim();
+        if (cleanTitle || origTitle) {
           session.attemptLabel = 'Buscando en servidor de alta velocidad';
-          showVodLoading(`Localizando "${cleanTitle}" en alta velocidad…`);
-          logAppAction('VOD_SEARCH_FALLBACK', { title: cleanTitle }, 'VOD');
-          const sResp = await fetch(`http://127.0.0.1:11472/api/vod/search?q=${encodeURIComponent(cleanTitle)}`, { signal: session.controller.signal });
-          const sData = await sResp.json();
+          showVodLoading(`Localizando "${cleanTitle || origTitle}" en alta velocidad…`);
+          logAppAction('VOD_SEARCH_FALLBACK', { title: cleanTitle || origTitle }, 'VOD');
+          let sData = { ok: false, items: [] };
+          if (cleanTitle) {
+            const sResp = await fetch(`http://127.0.0.1:11472/api/vod/search?q=${encodeURIComponent(cleanTitle)}`, { signal: session.controller.signal });
+            sData = await sResp.json();
+          }
+          if ((!sData.ok || !sData.items?.length) && origTitle && origTitle !== cleanTitle) {
+            const sResp2 = await fetch(`http://127.0.0.1:11472/api/vod/search?q=${encodeURIComponent(origTitle)}`, { signal: session.controller.signal });
+            sData = await sResp2.json();
+          }
           if (sData.ok && sData.items && sData.items.length > 0) {
             const sameKind = sData.items.filter(result =>
               !!(result.kind === 'serie' || result.type === 'teleplay' || result.type === 'series') === !!targetEp
             );
-            const found = findExactTitleMatch(sameKind, cleanTitle, targetEp?.seasonNum || item.seasonNum || null) || sameKind[0] || sData.items[0];
+            const found = findExactTitleMatch(sameKind, cleanTitle || origTitle, targetEp?.seasonNum || item.seasonNum || null) || sameKind[0] || sData.items[0];
             if (!found) throw new Error('No se encontró una coincidencia para este título.');
             let resolveId = found.id;
             let sid = '';
@@ -3060,6 +3068,10 @@ async function autoResolveAndPlayVod(item, targetEp = null, startTime = 0, selec
 
     const directUrl = item.streamUrl || item.stream_url;
     const localHls = directUrl?.match(/^http:\/\/127\.0\.0\.1:11472\/hls\/([a-f0-9]{40})\/(\d+)\//i);
+    const isMobilePlatform = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '') || window.__swordPlatform === 'ios' || window.__swordPlatform === 'android';
+    if (isMobilePlatform && !selectedStream && !isUsableVodUrl(directUrl)) {
+      throw new Error('Este título no está disponible en el catálogo móvil en este momento.');
+    }
     const streams = selectedStream ? [selectedStream] : isUsableVodUrl(directUrl)
       ? [{ ...item.streamMeta, ...(localHls ? { infoHash: localHls[1], fileIdx: Number(localHls[2]) } : {}), streamUrl: directUrl, qualityLabel: item.quality || '', languages: [], size: '' }]
       : await fetchStremioStreams(item, targetEp, null, session.controller.signal);
