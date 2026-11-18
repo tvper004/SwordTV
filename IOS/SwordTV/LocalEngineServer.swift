@@ -114,7 +114,7 @@ final class LocalEngineServer {
                 let tok = registerMedia(url: s["url"] as? String ?? "", headers: s["headers"] as? [String: String] ?? [:])
                 let mime = s["mime"] as? String ?? "video/mp4"
                 let ext = mime.contains("mp4") ? "video.mp4" : "stream.ts"
-                sendJson(conn, 200, ["ok": true, "name": s["name"] ?? "", "streamUrl": "http://127.0.0.1:\(port)/media/\(tok)/\(ext)", "mime": mime, "codec": s["codec"] ?? "", "quality": s["quality"] ?? "", "subtitles": []])
+                sendJson(conn, 200, ["ok": true, "name": s["name"] ?? "", "streamUrl": "http://127.0.0.1:\(port)/media/\(tok)/\(ext)", "mime": mime, "codec": s["codec"] ?? "", "quality": s["quality"] ?? "", "subtitles": s["subtitles"] ?? []])
             case "/sub", "/api/vod/sub":
                 guard let subUrl = query["url"], let u = URL(string: subUrl) else {
                     sendRaw(conn, status: 400, contentType: "text/plain", body: Data("Missing url".utf8))

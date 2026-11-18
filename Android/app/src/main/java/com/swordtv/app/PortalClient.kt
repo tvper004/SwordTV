@@ -29,6 +29,12 @@ class PortalClient {
         const val UA_CDN = "Ranger/4.9.4-17294ac0"
 
         private val HOSTS = mutableListOf("osuhk.m3x8o50te.com", "oogoy.f30c96w8.com")
+        private val DEVICE_FIXED = mapOf<String, Any>(
+            "loginType" to "2", "appLanguage" to "en", "hardwareInfo" to "ranchu",
+            "model" to "sdk_gphone64_arm64", "product" to "sdk_gphone64_arm64",
+            "cpu" to "arm64-v8a", "B29" to "", "reserve1" to "", "deviceToken" to "",
+            "drmId" to "", "sdkVer" to 36
+        )
         private val ROOT_CODES = mapOf(
             "featured" to "masnew_featured",
             "movies" to "masnew_movies",
@@ -176,28 +182,48 @@ class PortalClient {
         return liveDigestHex(base + LIVE_SALT)
     }
 
+    private fun slbBean(liveCodeList: List<String> = listOf("masnew_live")): JSONObject = JSONObject().apply {
+        put("hasPay", "0")
+        put("userIdentity", "1")
+        put("type", "merge")
+        put("appVer", APK_VERSION)
+        put("lang", "es")
+        put("encMediaSupported", 1)
+        put("liveCodeList", JSONArray(liveCodeList))
+        put("appParams", "")
+        put("reserve1", FIXED_MAC)
+        put("pipFlag", "0")
+    }
+
     private fun postPortal(path: String, body: JSONObject, includeAuth: Boolean = true): JSONObject {
-        val payload = JSONObject(body.toString())
+        val payload = JSONObject()
         if (includeAuth) {
             payload.put("portalCode", PORTAL_CODE)
             payload.put("userId", userId)
             payload.put("userToken", userToken)
-            payload.put("sn", sn)
-            payload.put("appVer", APK_VERSION)
-            payload.put("lang", "es")
         }
+        val keys = body.keys()
+        while (keys.hasNext()) {
+            val k = keys.next()
+            payload.put(k, body.get(k))
+        }
+        for ((k, v) in DEVICE_FIXED) payload.put(k, v)
+        payload.put("apkVersion", APK_VERSION)
+        payload.put("sysVersion", SPKG_VER)
+        payload.put("appId", APP_ID)
+        payload.put("sn", sn)
         val encrypted = encryptBody(payload.toString())
         var lastError: Exception? = null
         for (host in HOSTS.toList()) {
             try {
-                val conn = (URL("https://$host/$path").openConnection() as HttpURLConnection).apply {
+                val conn = (URL("https://$host/api/portalCore/$path").openConnection() as HttpURLConnection).apply {
                     requestMethod = "POST"
                     connectTimeout = 12000
                     readTimeout = 20000
                     doOutput = true
                     setRequestProperty("User-Agent", USER_AGENT)
                     setRequestProperty("Content-Type", "application/json;charset=utf-8")
-                    setRequestProperty("appId", APP_ID)
+                    setRequestProperty("apk", APP_ID)
                     setRequestProperty("apkVer", APK_VER_HEADER)
                     setRequestProperty("spkgVer", SPKG_VER)
                 }
@@ -272,12 +298,17 @@ class PortalClient {
     fun getLiveCategories(): JSONArray {
         liveCategoriesCache?.let { return it }
         ensureSession()
-        val data = postPortal("v6/getColumnList", JSONObject().put("type", "1"))
+        val data = postPortal("getNextColumns", JSONObject().apply {
+            put("columnCode", "masnew_live")
+            put("pageNum", 1)
+            put("pageSize", 50)
+            put("version", "")
+        })
         val list = data.optJSONArray("recommendList") ?: JSONArray()
         val out = JSONArray()
         for (i in 0 until list.length()) {
             val o = list.optJSONObject(i) ?: continue
-            val cid = o.optString("columnId")
+            val cid = o.opt("columnId")?.toString()?.trim().orEmpty()
             if (cid.isNotEmpty()) {
                 out.put(JSONObject().apply {
                     put("id", cid)
@@ -305,10 +336,12 @@ class PortalClient {
             val ch = list.optJSONObject(i) ?: continue
             val code = ch.optString("channelCode").trim()
             if (code.isEmpty()) continue
+            val pList = ch.optJSONArray("posterList")?.optJSONObject(0)?.optString("fileUrl").orEmpty()
+            val logo = ch.optString("posterUrl").ifEmpty { pList }.ifEmpty { ch.optString("icon", ch.optString("poster")) }
             out.put(JSONObject().apply {
                 put("channelCode", code)
                 put("name", ch.optString("name"))
-                put("logo", ch.optString("icon", ch.optString("poster")))
+                put("logo", logo)
                 put("num", ch.optInt("channelNumber", i + 1))
             })
         }
@@ -332,10 +365,7 @@ class PortalClient {
         val lic = chosen?.optString("license") ?: throw IllegalStateException("No license")
         val playCode = chosen.optString("playCode").ifEmpty { channelCode }
 
-        val slb = postPortal("v14/getSlbInfo", JSONObject().apply {
-            put("portalCode", PORTAL_CODE)
-            put("liveCodeList", JSONArray().put(channelCode))
-        })
+        val slb = postPortal("v14/getSlbInfo", slbBean(listOf(channelCode)))
         val cdns = slb.optJSONArray("cdn_list") ?: JSONArray()
         for (i in 0 until cdns.length()) {
             val c = cdns.optJSONObject(i) ?: continue
@@ -412,29 +442,39 @@ class PortalClient {
 
     fun detail(contentId: String): JSONObject {
         ensureSession()
-        val data = postPortal("v3/loadDetail", JSONObject().apply {
-            put("contentId", contentId); put("type", "1")
+        val data = postPortal("v4/getItemData", JSONObject().apply {
+            put("contentId", contentId)
+            put("type", "0")
+            put("sortType", "0")
+            put("language", "en")
+            put("macAddr", FIXED_MAC)
         })
-        val item = mapAsset(data, "") ?: JSONObject().put("id", contentId)
+        val asset = data.optJSONObject("assetData") ?: data
+        val item = mapAsset(asset, "") ?: JSONObject().put("id", contentId)
         val eps = JSONArray()
-        val rawEps = data.optJSONArray("episodeList") ?: JSONArray()
+        val rawEps = asset.optJSONArray("simpleProgramList") ?: JSONArray()
         for (i in 0 until rawEps.length()) {
             val e = rawEps.optJSONObject(i) ?: continue
             eps.put(JSONObject().apply {
                 put("id", e.optString("contentId"))
-                put("title", e.optString("name", e.optString("title", "Capítulo ${i + 1}")))
-                put("number", e.optInt("volumnCount", i + 1))
+                put("title", e.optString("name", "Capítulo ${i + 1}"))
+                put("name", e.optString("name", ""))
+                put("number", e.optInt("seriesNumber", i + 1))
                 put("duration", e.optString("duration", ""))
-                put("quality", "1080p HD")
+                put("quality", e.optString("quality", "1080p HD"))
+                put("picture", e.optString("picture", e.optString("poster", "")))
+                put("description", e.optString("description", ""))
             })
         }
         val seasons = JSONArray()
-        val rawSeasons = data.optJSONArray("seriesList") ?: JSONArray()
+        val rawSeasons = asset.optJSONArray("sameSeasonSeriesList") ?: JSONArray()
         for (i in 0 until rawSeasons.length()) {
             val s = rawSeasons.optJSONObject(i) ?: continue
+            val sid = s.optString("contentId").trim()
+            if (sid.isEmpty()) continue
             seasons.put(JSONObject().apply {
-                put("id", s.optString("contentId"))
-                put("number", s.optInt("volumnCount", i + 1))
+                put("id", sid)
+                put("number", s.optInt("seasonNumber", 1))
             })
         }
         return JSONObject().apply {
@@ -444,39 +484,72 @@ class PortalClient {
 
     fun resolveVod(contentId: String, seriesId: String): JSONObject {
         ensureSession()
-        val play = postPortal("v3/loadPlay", JSONObject().apply {
+        val play = postPortal("v10/startPlayVOD", JSONObject().apply {
             put("contentId", contentId)
             put("seriesContentId", seriesId)
-            put("type", if (seriesId.isNotEmpty()) "2" else "1")
+            put("startTime", 0)
+            put("type", "1")
+            put("columnId", 0)
+            put("authType", "")
         })
-        val tracks = play.optJSONArray("playUrlList") ?: JSONArray()
-        val track = tracks.optJSONObject(0) ?: throw IllegalStateException("No stream tracks")
+        val ep = play.optJSONArray("episodeList")?.optJSONObject(0)
+            ?: throw IllegalStateException("Sin episodios")
+        val tracks = mutableListOf<JSONObject>()
+        val totals = ep.optJSONArray("totalMovieList") ?: JSONArray()
+        for (i in 0 until totals.length()) {
+            val tm = totals.optJSONObject(i) ?: continue
+            val movies = tm.optJSONArray("movieList") ?: continue
+            for (j in 0 until movies.length()) {
+                val m = movies.optJSONObject(j) ?: continue
+                if (m.optString("contentId").isNotEmpty()) tracks.add(m)
+            }
+        }
+        val track = tracks.firstOrNull() ?: throw IllegalStateException("Sin pistas de video")
         val lic = track.optJSONArray("licenseList")?.optJSONObject(0)?.optString("license") ?: ""
         val slb = slbCache?.takeIf { System.currentTimeMillis() - it.first < 300_000 }?.second
-            ?: postPortal("v2/getSlbInfo", JSONObject().put("portalCode", PORTAL_CODE)).also {
+            ?: postPortal("v14/getSlbInfo", slbBean()).also {
                 slbCache = System.currentTimeMillis() to it
             }
         val cdns = slb.optJSONArray("cdn_list") ?: JSONArray()
         for (i in 0 until cdns.length()) {
             val c = cdns.optJSONObject(i) ?: continue
-            if (!c.optString("tag").contains("vod")) continue
+            if (c.optString("tag") != "vod") continue
             val host = c.optString("main_addr").removePrefix("https://").removePrefix("http://").substringBefore("/")
-            val auth = c.optJSONArray("url_list")?.optJSONObject(0)?.optString("url") ?: ""
-            val ext = if (track.optString("videoFormat").equals("ts", true)) "ts" else "mp4"
-            return JSONObject().apply {
-                put("url", "https://$host/vod/${track.optString("contentId")}_media.$ext")
-                put("mime", if (ext == "ts") "video/mp2t" else "video/mp4")
-                put("codec", track.optString("encodeFormat", "H264"))
-                put("quality", track.optString("quality", "1080p"))
-                put("name", play.optString("name", ""))
-                put("headers", JSONObject().apply {
-                    put("Content-Auth", auth)
-                    put("Content-License", lic)
-                    put("User-Agent", UA_CDN)
-                    put("App", APP_ID)
-                    put("App-Version", APK_VERSION)
-                })
-                put("subtitles", JSONArray())
+            val urls = c.optJSONArray("url_list") ?: continue
+            for (j in 0 until urls.length()) {
+                val u = urls.optJSONObject(j) ?: continue
+                val auth = u.optString("url")
+                if (u.optString("tag") == "free" && (u.optString("sign_type") == "cfl" || auth.contains("sign_type=cfl"))) {
+                    val ext = if (track.optString("videoFormat").equals("ts", true)) "ts" else "mp4"
+                    val subs = JSONArray()
+                    val rawSubs = ep.optJSONArray("subtitleList") ?: JSONArray()
+                    for (k in 0 until rawSubs.length()) {
+                        val s = rawSubs.optJSONObject(k) ?: continue
+                        val su = s.optJSONArray("file")?.optJSONObject(0)?.optString("url") ?: ""
+                        if (su.isNotEmpty()) {
+                            subs.put(JSONObject().apply {
+                                put("lang", s.optString("language", "es"))
+                                put("url", su)
+                                put("format", s.optString("fileType", "srt"))
+                            })
+                        }
+                    }
+                    return JSONObject().apply {
+                        put("url", "https://$host/vod/${track.optString("contentId")}_media.$ext")
+                        put("mime", if (ext == "ts") "video/mp2t" else "video/mp4")
+                        put("codec", track.optString("encodeFormat", "H264"))
+                        put("quality", track.optString("quality", "1080p"))
+                        put("name", play.optString("name", ""))
+                        put("headers", JSONObject().apply {
+                            put("Content-Auth", auth)
+                            put("Content-License", lic)
+                            put("User-Agent", UA_CDN)
+                            put("App", APP_ID)
+                            put("App-Version", APK_VERSION)
+                        })
+                        put("subtitles", subs)
+                    }
+                }
             }
         }
         throw IllegalStateException("No VOD CDN available")

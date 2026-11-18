@@ -1,7 +1,7 @@
 import Foundation
 import CommonCrypto
 
-/// Native Swift implementation of the SwordTV high-speed portal client (adapted from magis.js).
+/// Native Swift implementation of the SwordTV high-speed portal client (100% aligned with magis.js).
 final class PortalClient {
     static let uaCDN = "Ranger/4.9.4-17294ac0"
     private let keyHex = "e7af1ed7de1ffddd7bd3fe37ebdffde9ef3fe1ae39edfeb8"
@@ -14,6 +14,13 @@ final class PortalClient {
     private let snTokenSalt = "ntFT65w6itH!lHCPw7D=@qnsFC5adD28"
     private let fixedMac = "02:00:00:00:00:00"
     private let hosts = ["osuhk.m3x8o50te.com", "oogoy.f30c96w8.com"]
+
+    private let deviceFixed: [String: Any] = [
+        "loginType": "2", "appLanguage": "en", "hardwareInfo": "ranchu",
+        "model": "sdk_gphone64_arm64", "product": "sdk_gphone64_arm64",
+        "cpu": "arm64-v8a", "B29": "", "reserve1": "", "deviceToken": "",
+        "drmId": "", "sdkVer": 36
+    ]
 
     private let rootCodes: [String: String] = [
         "featured": "masnew_featured",
@@ -58,6 +65,7 @@ final class PortalClient {
     private var userToken = ""
     private let lock = NSLock()
     private var slbCache: (Date, [String: Any])?
+    private var liveCategoriesCache: [[String: Any]]?
 
     private func hexToData(_ hex: String) -> Data {
         var data = Data()
@@ -72,6 +80,13 @@ final class PortalClient {
 
     private func dataToHex(_ data: Data) -> String {
         data.map { String(format: "%02x", $0) }.joined()
+    }
+
+    private func md5Hex(_ str: String) -> String {
+        let data = Data(str.utf8)
+        var digest = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
+        _ = data.withUnsafeBytes { CC_MD5($0.baseAddress, CC_LONG(data.count), &digest) }
+        return dataToHex(Data(digest))
     }
 
     private func randomHex(_ bytes: Int) -> String {
@@ -167,27 +182,40 @@ final class PortalClient {
         return liveDigestHex(data)
     }
 
+    private func slbBean(liveCodeList: [String] = ["masnew_live"]) -> [String: Any] {
+        return [
+            "hasPay": "0", "userIdentity": "1", "type": "merge",
+            "appVer": apkVersion, "lang": "es", "encMediaSupported": 1,
+            "liveCodeList": liveCodeList, "appParams": "",
+            "reserve1": fixedMac, "pipFlag": "0"
+        ]
+    }
+
     private func postPortal(path: String, body: [String: Any], includeAuth: Bool = true) throws -> [String: Any] {
-        var payload = body
+        var payload: [String: Any] = [:]
         if includeAuth {
             payload["portalCode"] = portalCode
             payload["userId"] = userId
             payload["userToken"] = userToken
-            payload["sn"] = sn
-            payload["appVer"] = apkVersion
-            payload["lang"] = "es"
         }
+        for (k, v) in body { payload[k] = v }
+        for (k, v) in deviceFixed { payload[k] = v }
+        payload["apkVersion"] = apkVersion
+        payload["sysVersion"] = spkgVer
+        payload["appId"] = appId
+        payload["sn"] = sn
+
         let jsonData = try JSONSerialization.data(withJSONObject: payload)
         let encrypted = encryptBody(String(data: jsonData, encoding: .utf8) ?? "{}")
         var lastErr: Error = NSError(domain: "SwordTV", code: -1)
         for host in hosts {
-            guard let url = URL(string: "https://\(host)/\(path)") else { continue }
+            guard let url = URL(string: "https://\(host)/api/portalCore/\(path)") else { continue }
             var req = URLRequest(url: url, timeoutInterval: 15)
             req.httpMethod = "POST"
             req.httpBody = encrypted.data(using: .utf8)
             req.setValue(userAgent, forHTTPHeaderField: "User-Agent")
             req.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
-            req.setValue(appId, forHTTPHeaderField: "appId")
+            req.setValue(appId, forHTTPHeaderField: "apk")
             req.setValue(apkVerHeader, forHTTPHeaderField: "apkVer")
             req.setValue(spkgVer, forHTTPHeaderField: "spkgVer")
 
@@ -222,13 +250,16 @@ final class PortalClient {
             "androidId": randomHex(8), "cpuId": randomHex(8), "serialNumber": randomHex(8),
             "etheMac": fixedMac, "gatewayMac": fixedMac, "wifiMac": fixedMac,
             "board": "goldfish_arm64", "brand": "google", "cpuAbi": "arm64-v8a",
-            "device": "emu64a", "diskInfo": "8GB", "hardware": "ranchu",
-            "manufacturer": "Google", "model": "sdk_gphone64_arm64", "product": "sdk_gphone64_arm64",
-            "ramSize": "4GB", "romSize": "8GB", "sdkVer": 36
+            "device": "emu64a", "diskInfo": "8GB", "display": "sdk_gphone64_arm64",
+            "fingerprint": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036/11228894:user/release-keys",
+            "hardware": "ranchu", "host": "abfarm", "manufacturer": "Google",
+            "model": "sdk_gphone64_arm64", "product": "sdk_gphone64_arm64",
+            "ramSize": "4GB", "romSize": "8GB", "tags": "release-keys", "verId": ""
         ]
         let snData = try postPortal(path: "v3/snToken", body: fp, includeAuth: false)
         snToken = (snData["snToken"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        sn = (snData["sn"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let rawSn = (snData["sn"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        sn = (rawSn.isEmpty ? md5Hex(snToken + snTokenSalt) : rawSn).lowercased()
         let active = try postPortal(path: "v8/active", body: [
             "snToken": snToken, "authVersion": "", "authCode": "", "preCode": "",
             "macAddr": fixedMac, "reserve1": "", "openNum": 4, "channel": "default", "matadata": "", "signdata": ""
@@ -239,13 +270,22 @@ final class PortalClient {
     }
 
     func getLiveCategories() throws -> [[String: Any]] {
+        if let c = liveCategoriesCache, !c.isEmpty { return c }
         try ensureSession()
-        let data = try postPortal(path: "v6/getColumnList", body: ["type": "1"])
+        let data = try postPortal(path: "getNextColumns", body: [
+            "columnCode": "masnew_live", "pageNum": 1, "pageSize": 50, "version": ""
+        ])
         let list = data["recommendList"] as? [[String: Any]] ?? []
-        return list.compactMap { o in
+        let out: [[String: Any]] = list.enumerated().compactMap { (i, o) in
             guard let cid = o["columnId"] else { return nil }
-            return ["id": "\(cid)", "name": o["name"] as? String ?? "Categoría", "code": o["code"] as? String ?? ""]
+            return [
+                "id": "\(cid)",
+                "name": (o["name"] as? String) ?? (o["title"] as? String) ?? "Categoría \(i + 1)",
+                "code": (o["code"] as? String) ?? ""
+            ]
         }
+        liveCategoriesCache = out
+        return out
     }
 
     func getLiveChannels(catId: String?, page: Int, size: Int) throws -> ([[String: Any]], Bool) {
@@ -256,10 +296,15 @@ final class PortalClient {
         let list = data["channelList"] as? [[String: Any]] ?? []
         let out = list.enumerated().compactMap { (idx, ch) -> [String: Any]? in
             guard let code = ch["channelCode"] as? String, !code.isEmpty else { return nil }
+            let pList = (ch["posterList"] as? [[String: Any]])?.first?["fileUrl"] as? String ?? ""
+            let logo = (ch["posterUrl"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+                ?? (pList.isEmpty ? nil : pList)
+                ?? (ch["icon"] as? String)
+                ?? (ch["poster"] as? String ?? "")
             return [
                 "channelCode": code,
                 "name": ch["name"] as? String ?? "",
-                "logo": (ch["icon"] as? String) ?? (ch["poster"] as? String ?? ""),
+                "logo": logo,
                 "num": ch["channelNumber"] as? Int ?? (idx + 1)
             ]
         }
@@ -273,7 +318,7 @@ final class PortalClient {
         let chosen = addrs.first { ($0["license"] as? String)?.isEmpty == false } ?? addrs.first
         guard let lic = chosen?["license"] as? String, !lic.isEmpty else { throw NSError(domain: "SwordTV", code: 404) }
         let playCode = (chosen?["playCode"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? channelCode
-        let slb = try postPortal(path: "v14/getSlbInfo", body: ["portalCode": portalCode, "liveCodeList": [channelCode]])
+        let slb = try postPortal(path: "v14/getSlbInfo", body: slbBean(liveCodeList: [channelCode]))
         for c in (slb["cdn_list"] as? [[String: Any]] ?? []) where (c["tag"] as? String) == "live" {
             let host = (c["main_addr"] as? String ?? "").replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "").components(separatedBy: "/").first ?? ""
             for u in (c["url_list"] as? [[String: Any]] ?? []) {
@@ -316,40 +361,76 @@ final class PortalClient {
 
     func detail(contentId: String) throws -> [String: Any] {
         try ensureSession()
-        let data = try postPortal(path: "v3/loadDetail", body: ["contentId": contentId, "type": "1"])
-        let item = mapAsset(data, cat: "") ?? ["id": contentId]
-        let eps = (data["episodeList"] as? [[String: Any]] ?? []).enumerated().map { (i, e) -> [String: Any] in
-            ["id": e["contentId"] ?? "", "title": e["name"] ?? e["title"] ?? "Capítulo \(i + 1)", "number": e["volumnCount"] ?? (i + 1), "duration": e["duration"] ?? "", "quality": "1080p HD"]
+        let data = try postPortal(path: "v4/getItemData", body: [
+            "contentId": contentId, "type": "0", "sortType": "0", "language": "en", "macAddr": fixedMac
+        ])
+        let asset = (data["assetData"] as? [String: Any]) ?? data
+        let item = mapAsset(asset, cat: "") ?? ["id": contentId]
+        let eps = (asset["simpleProgramList"] as? [[String: Any]] ?? []).enumerated().map { (i, e) -> [String: Any] in
+            [
+                "id": e["contentId"] ?? "",
+                "title": e["name"] ?? "Capítulo \(i + 1)",
+                "name": e["name"] ?? "",
+                "number": e["seriesNumber"] ?? (i + 1),
+                "duration": e["duration"] ?? "",
+                "quality": e["quality"] ?? "1080p HD",
+                "picture": e["picture"] ?? e["poster"] ?? "",
+                "description": e["description"] ?? ""
+            ]
         }
-        let seasons = (data["seriesList"] as? [[String: Any]] ?? []).enumerated().map { (i, s) -> [String: Any] in
-            ["id": s["contentId"] ?? "", "number": s["volumnCount"] ?? (i + 1)]
+        let seasons = (asset["sameSeasonSeriesList"] as? [[String: Any]] ?? []).compactMap { s -> [String: Any]? in
+            guard let sid = s["contentId"] as? String, !sid.isEmpty else { return nil }
+            return ["id": sid, "number": s["seasonNumber"] ?? 1]
         }
         return ["item": item, "episodes": eps, "seasons": seasons]
     }
 
     func resolveVod(contentId: String, seriesId: String) throws -> [String: Any] {
         try ensureSession()
-        let play = try postPortal(path: "v3/loadPlay", body: ["contentId": contentId, "seriesContentId": seriesId, "type": seriesId.isEmpty ? "1" : "2"])
-        let track = (play["playUrlList"] as? [[String: Any]] ?? []).first ?? [:]
+        let play = try postPortal(path: "v10/startPlayVOD", body: [
+            "contentId": contentId, "seriesContentId": seriesId,
+            "startTime": 0, "type": "1", "columnId": 0, "authType": ""
+        ])
+        guard let ep = (play["episodeList"] as? [[String: Any]])?.first else {
+            throw NSError(domain: "SwordTV", code: 404, userInfo: [NSLocalizedDescriptionKey: "Sin episodios"])
+        }
+        var tracks: [[String: Any]] = []
+        for tm in (ep["totalMovieList"] as? [[String: Any]] ?? []) {
+            for m in (tm["movieList"] as? [[String: Any]] ?? []) where (m["contentId"] as? String)?.isEmpty == false {
+                tracks.append(m)
+            }
+        }
+        guard let track = tracks.first else {
+            throw NSError(domain: "SwordTV", code: 404, userInfo: [NSLocalizedDescriptionKey: "Sin pistas de video"])
+        }
         let lic = ((track["licenseList"] as? [[String: Any]])?.first?["license"] as? String) ?? ""
         let slb: [String: Any]
         if let c = slbCache, Date().timeIntervalSince(c.0) < 300 { slb = c.1 }
         else {
-            slb = try postPortal(path: "v2/getSlbInfo", body: ["portalCode": portalCode])
+            slb = try postPortal(path: "v14/getSlbInfo", body: slbBean())
             slbCache = (Date(), slb)
         }
-        for c in (slb["cdn_list"] as? [[String: Any]] ?? []) where (c["tag"] as? String ?? "").contains("vod") {
+        for c in (slb["cdn_list"] as? [[String: Any]] ?? []) where (c["tag"] as? String) == "vod" {
             let host = (c["main_addr"] as? String ?? "").replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "").components(separatedBy: "/").first ?? ""
-            let auth = ((c["url_list"] as? [[String: Any]])?.first?["url"] as? String) ?? ""
-            let ext = ((track["videoFormat"] as? String ?? "").lowercased() == "ts") ? "ts" : "mp4"
-            return [
-                "url": "https://\(host)/vod/\(track["contentId"] ?? "")_media.\(ext)",
-                "mime": ext == "ts" ? "video/mp2t" : "video/mp4",
-                "codec": track["encodeFormat"] ?? "H264",
-                "quality": track["quality"] ?? "1080p",
-                "name": play["name"] ?? "",
-                "headers": ["Content-Auth": auth, "Content-License": lic, "User-Agent": Self.uaCDN, "App": appId, "App-Version": apkVersion]
-            ]
+            for u in (c["url_list"] as? [[String: Any]] ?? []) {
+                let auth = u["url"] as? String ?? ""
+                if (u["tag"] as? String) == "free" && ((u["sign_type"] as? String) == "cfl" || auth.contains("sign_type=cfl")) {
+                    let ext = ((track["videoFormat"] as? String ?? "").lowercased() == "ts") ? "ts" : "mp4"
+                    let subs: [[String: Any]] = (ep["subtitleList"] as? [[String: Any]] ?? []).compactMap { s in
+                        guard let f = (s["file"] as? [[String: Any]])?.first, let su = f["url"] as? String, !su.isEmpty else { return nil }
+                        return ["lang": s["language"] ?? "es", "url": su, "format": s["fileType"] ?? "srt"]
+                    }
+                    return [
+                        "url": "https://\(host)/vod/\(track["contentId"] ?? "")_media.\(ext)",
+                        "mime": ext == "ts" ? "video/mp2t" : "video/mp4",
+                        "codec": track["encodeFormat"] ?? "H264",
+                        "quality": track["quality"] ?? "1080p",
+                        "name": play["name"] ?? "",
+                        "headers": ["Content-Auth": auth, "Content-License": lic, "User-Agent": Self.uaCDN, "App": appId, "App-Version": apkVersion],
+                        "subtitles": subs
+                    ]
+                }
+            }
         }
         throw NSError(domain: "SwordTV", code: 502)
     }
