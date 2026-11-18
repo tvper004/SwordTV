@@ -24,6 +24,15 @@ final class LocalEngineServer {
         func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
             completionHandler(request)
         }
+
+        func urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+            if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+               let trust = challenge.protectionSpace.serverTrust {
+                completionHandler(.useCredential, URLCredential(trust: trust))
+            } else {
+                completionHandler(.performDefaultHandling, nil)
+            }
+        }
     }
 
     init(portal: PortalClient, port: UInt16 = 11472) {
@@ -84,7 +93,12 @@ final class LocalEngineServer {
         do {
             switch path {
             case "/ping", "/api/ping":
-                sendJson(conn, 200, ["ok": true, "service": "SwordTV iOS Engine", "version": "2.0.0", "sessionReady": portal.sessionReady])
+                let dev = deviceInfo()
+                sendJson(conn, 200, [
+                    "ok": true, "service": "SwordTV iOS Engine", "version": "2.0.0",
+                    "sessionReady": portal.sessionReady,
+                    "platform": "ios", "deviceModel": dev.model, "chip": dev.chip
+                ])
             case "/api/live/categories":
                 sendJson(conn, 200, ["ok": true, "categories": try portal.getLiveCategories()])
             case "/api/live/channels":
@@ -111,10 +125,16 @@ final class LocalEngineServer {
                 sendJson(conn, 200, det)
             case "/api/vod/resolve":
                 let s = try portal.resolveVod(contentId: query["id"] ?? query["contentId"] ?? "", seriesId: query["seriesId"] ?? query["seriesContentId"] ?? "")
-                let tok = registerMedia(url: s["url"] as? String ?? "", headers: s["headers"] as? [String: String] ?? [:])
+                let rawUrl = s["url"] as? String ?? ""
+                let hdrs = s["headers"] as? [String: String] ?? [:]
+                let tok = registerMedia(url: rawUrl, headers: hdrs)
                 let mime = s["mime"] as? String ?? "video/mp4"
-                let ext = mime.contains("mp4") ? "video.mp4" : "stream.ts"
-                sendJson(conn, 200, ["ok": true, "name": s["name"] ?? "", "streamUrl": "http://127.0.0.1:\(port)/media/\(tok)/\(ext)", "mime": mime, "codec": s["codec"] ?? "", "quality": s["quality"] ?? "", "subtitles": s["subtitles"] ?? []])
+                let isTs = mime.contains("mp2t") || rawUrl.lowercased().contains(".ts")
+                let streamUrl = isTs
+                    ? "http://127.0.0.1:\(port)/vod-hls/\(tok)/stream.m3u8"
+                    : "http://127.0.0.1:\(port)/media/\(tok)/video.mp4"
+                let outMime = isTs ? "application/x-mpegurl" : mime
+                sendJson(conn, 200, ["ok": true, "name": s["name"] ?? "", "streamUrl": streamUrl, "mime": outMime, "codec": s["codec"] ?? "", "quality": s["quality"] ?? "", "subtitles": s["subtitles"] ?? []])
             case "/sub", "/api/vod/sub":
                 guard let subUrl = query["url"], let u = URL(string: subUrl) else {
                     sendRaw(conn, status: 400, contentType: "text/plain", body: Data("Missing url".utf8))
@@ -132,6 +152,11 @@ final class LocalEngineServer {
             default:
                 if path == "/" || path == "/web" || path.hasPrefix("/web/") {
                     serveWebAsset(conn, path: path)
+                } else if path.hasPrefix("/vod-hls/") {
+                    let tok = String(path.dropFirst(9).split(separator: "/").first ?? "")
+                    tokenLock.lock(); let target = tokens[tok]; tokenLock.unlock()
+                    guard let target else { sendRaw(conn, status: 404, contentType: "text/plain", body: Data("expired".utf8)); return }
+                    serveVodHls(conn, token: tok, target: target)
                 } else if path.hasPrefix("/media/") {
                     let tok = String(path.dropFirst(7).split(separator: "/").first ?? "")
                     tokenLock.lock(); let target = tokens[tok]; tokenLock.unlock()
@@ -203,6 +228,15 @@ final class LocalEngineServer {
             completionHandler(request)
         }
 
+        func urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+            if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+               let trust = challenge.protectionSpace.serverTrust {
+                completionHandler(.useCredential, URLCredential(trust: trust))
+            } else {
+                completionHandler(.performDefaultHandling, nil)
+            }
+        }
+
         func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
             let http = response as? HTTPURLResponse
             statusCode = http?.statusCode ?? 200
@@ -245,7 +279,81 @@ final class LocalEngineServer {
                     conn.send(content: nil, isComplete: true, completion: .contentProcessed { _ in self.conn.cancel() })
                 }
             }
+            session.finishTasksAndInvalidate()
         }
+    }
+
+    private func deviceInfo() -> (model: String, chip: String) {
+        var sys = utsname()
+        uname(&sys)
+        let machine = withUnsafePointer(to: &sys.machine) {
+            $0.withMemoryRebound(to: CChar.self, capacity: 1) { String(cString: $0) }
+        }
+        let map: [String: (String, String)] = [
+            "iPhone14,2": ("iPhone 13 Pro", "Apple A15 Bionic"),
+            "iPhone14,3": ("iPhone 13 Pro Max", "Apple A15 Bionic"),
+            "iPhone14,4": ("iPhone 13 mini", "Apple A15 Bionic"),
+            "iPhone14,5": ("iPhone 13", "Apple A15 Bionic"),
+            "iPhone14,6": ("iPhone SE (3.ª gen.)", "Apple A15 Bionic"),
+            "iPhone14,7": ("iPhone 14", "Apple A15 Bionic"),
+            "iPhone14,8": ("iPhone 14 Plus", "Apple A15 Bionic"),
+            "iPhone15,2": ("iPhone 14 Pro", "Apple A16 Bionic"),
+            "iPhone15,3": ("iPhone 14 Pro Max", "Apple A16 Bionic"),
+            "iPhone15,4": ("iPhone 15", "Apple A16 Bionic"),
+            "iPhone15,5": ("iPhone 15 Plus", "Apple A16 Bionic"),
+            "iPhone16,1": ("iPhone 15 Pro", "Apple A17 Pro"),
+            "iPhone16,2": ("iPhone 15 Pro Max", "Apple A17 Pro"),
+            "iPhone17,1": ("iPhone 16 Pro", "Apple A18 Pro"),
+            "iPhone17,2": ("iPhone 16 Pro Max", "Apple A18 Pro"),
+            "iPhone17,3": ("iPhone 16", "Apple A18"),
+            "iPhone17,4": ("iPhone 16 Plus", "Apple A18"),
+            "arm64": ("iOS Simulator", "Apple Silicon (VideoToolbox)"),
+            "x86_64": ("iOS Simulator", "Apple VideoToolbox")
+        ]
+        if let hit = map[machine] { return hit }
+        return (machine, "Apple Silicon (VideoToolbox)")
+    }
+
+    private func serveVodHls(_ conn: NWConnection, token: String, target: MediaTarget) {
+        guard let url = URL(string: target.url) else {
+            sendRaw(conn, status: 400, contentType: "text/plain", body: Data("bad url".utf8))
+            return
+        }
+        var req = URLRequest(url: url, timeoutInterval: 15)
+        req.httpMethod = "GET"
+        req.setValue("bytes=0-0", forHTTPHeaderField: "Range")
+        target.headers.forEach { req.setValue($1, forHTTPHeaderField: $0) }
+        session.dataTask(with: req) { _, resp, _ in
+            let http = resp as? HTTPURLResponse
+            let cr = http?.value(forHTTPHeaderField: "Content-Range") ?? ""
+            var total: Int64 = 0
+            if let slashIdx = cr.lastIndex(of: "/"),
+               let parsed = Int64(cr[cr.index(after: slashIdx)...].trimmingCharacters(in: .whitespaces)) {
+                total = parsed
+            }
+            if total <= 0 {
+                let clHeader = Int64(http?.value(forHTTPHeaderField: "Content-Length") ?? "") ?? 0
+                total = clHeader > 0 ? clHeader : (resp?.expectedContentLength ?? 0)
+            }
+            guard total > 0 else {
+                self.sendRaw(conn, status: 502, contentType: "text/plain", body: Data("no content length".utf8))
+                return
+            }
+            let chunk: Int64 = 188 * 10000 // 1.88 MB aligned to 188-byte MPEG-TS packets
+            let segUrl = "http://127.0.0.1:\(self.port)/media/\(token)/stream.ts"
+            var lines = ["#EXTM3U", "#EXT-X-VERSION:4", "#EXT-X-TARGETDURATION:10", "#EXT-X-MEDIA-SEQUENCE:0", "#EXT-X-PLAYLIST-TYPE:VOD"]
+            var offset: Int64 = 0
+            while offset < total {
+                let len = min(chunk, total - offset)
+                lines.append("#EXTINF:8.000,")
+                lines.append("#EXT-X-BYTERANGE:\(len)@\(offset)")
+                lines.append(segUrl)
+                offset += len
+            }
+            lines.append("#EXT-X-ENDLIST")
+            let m3u8 = lines.joined(separator: "\n") + "\n"
+            self.sendRaw(conn, status: 200, contentType: "application/vnd.apple.mpegurl", body: Data(m3u8.utf8))
+        }.resume()
     }
 
     private func proxyMedia(_ conn: NWConnection, method: String, urlStr: String, headers: [String: String], range: String?, token: String) {

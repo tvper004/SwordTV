@@ -3130,7 +3130,7 @@ async function openStremioSourcesModal(item, targetEp = null, customSearch = nul
         <div class="stream-card-tags">
           <span class="tag-audio">${stream.languages.join(' • ')}</span>
           <span class="tag-subs">💬 Subtítulos disponibles</span>
-          <span class="tag-format">🎬 Streaming M4</span>
+          <span class="tag-format">🎬 Streaming HD</span>
         </div>
       </div>
       <div class="stream-card-right">
@@ -5052,10 +5052,20 @@ function setupSettingsSection() {
   parentalPinInput.addEventListener('change', saveAll);
   hwToggle.addEventListener('change', saveAll);
 
-  // Apple Silicon M4 / Media Engine Hardware Acceleration Chip Badge
+  // Dynamic Hardware Acceleration Chip Badge
   const chipBadge = document.getElementById('hw-chip-badge');
   if (chipBadge) {
-    chipBadge.textContent = '⚡ Chip Detectado: Apple Silicon M4 (Media Engine Activo • 60 FPS • Metal 3)';
+    fetch('http://127.0.0.1:11472/api/ping').then(r => r.json()).then(d => {
+      if (d?.chip || d?.deviceModel) {
+        const accel = d.platform === 'android' ? 'MediaCodec • OpenGL ES' : 'VideoToolbox • Metal';
+        const label = [d.chip, d.deviceModel].filter(Boolean).join(' • ');
+        chipBadge.textContent = `⚡ Chip Detectado: ${label} (${accel})`;
+      } else {
+        chipBadge.textContent = '⚡ Aceleración por Hardware Activa (VideoToolbox / MediaCodec)';
+      }
+    }).catch(() => {
+      chipBadge.textContent = '⚡ Aceleración por Hardware Activa';
+    });
   }
 
   // Channel Validator Controller in Settings

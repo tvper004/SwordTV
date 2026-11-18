@@ -100,6 +100,9 @@ class LocalEngineServer(private val portal: PortalClient, private val port: Int 
                             put("service", "SwordTV Android Engine")
                             put("version", "2.0.0")
                             put("sessionReady", portal.sessionReady)
+                            put("platform", "android")
+                            put("deviceModel", "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}".trim())
+                            put("chip", android.os.Build.HARDWARE.ifEmpty { "MediaCodec" })
                         })
                     }
                     path == "/api/live/categories" -> {
