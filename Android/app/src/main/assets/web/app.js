@@ -1028,6 +1028,8 @@ async function executePlayLiveChannel(ch, triedIds = new Set()) {
     video.onplaying = null;
     video.onerror = null;
     video.onpause = null;
+    video.onstalled = null;
+    video.onwaiting = null;
   }
 
   if (state.hlsLive) {
@@ -1128,17 +1130,37 @@ async function executePlayLiveChannel(ch, triedIds = new Set()) {
   let videoWatchdogTimer = null;
   let lastDecodedFrameCount = null;
   let lastDecodedFrameAt = Date.now();
+  let lastPlaybackTime = -1;
+  let lastPlaybackAt = Date.now();
+
+  const kickLivePlayback = () => {
+    if (currentGen !== liveSessionGen || video.paused) return;
+    video.play().catch(() => {});
+  };
+  video.onstalled = kickLivePlayback;
+  video.onwaiting = () => {
+    setTimeout(kickLivePlayback, 1500);
+  };
 
   state.liveFrameWatchdog = setInterval(() => {
     if (currentGen !== liveSessionGen || video.paused) return;
+    const now = Date.now();
+    const curT = Number(video.currentTime);
+    if (Number.isFinite(curT) && Math.abs(curT - lastPlaybackTime) > 0.05) {
+      lastPlaybackTime = curT;
+      lastPlaybackAt = now;
+    }
     const frames = Number(video.webkitDecodedFrameCount);
-    if (!Number.isFinite(frames)) return;
-    if (lastDecodedFrameCount === null || frames !== lastDecodedFrameCount) {
+    if (Number.isFinite(frames) && frames > 0 && (lastDecodedFrameCount === null || frames !== lastDecodedFrameCount)) {
       lastDecodedFrameCount = frames;
-      lastDecodedFrameAt = Date.now();
+      lastDecodedFrameAt = now;
+    }
+    const timeAdvancing = (now - lastPlaybackAt) < 14000;
+    const framesAdvancing = Number.isFinite(frames) && frames > 0 && (now - lastDecodedFrameAt) < 20000;
+    if (timeAdvancing || framesAdvancing) {
+      if ((now - lastPlaybackAt) > 5000) kickLivePlayback();
       return;
     }
-    if (Date.now() - lastDecodedFrameAt < 20000) return;
 
     clearInterval(state.liveFrameWatchdog);
     state.liveFrameWatchdog = null;
@@ -1146,12 +1168,12 @@ async function executePlayLiveChannel(ch, triedIds = new Set()) {
     logAppAction('CHANNEL_VIDEO_FRAME_STALL', { name: ch.name, relay: usedRelay, attempts }, 'PLAYER');
     if (!usedRelay && ch.relayUrl) {
       playRelayMode();
-    } else if (attempts < 1) {
+    } else if (attempts < 3) {
       executePlayLiveChannel({ ...ch, relayUrl: '', frameRecoveryAttempts: attempts + 1 });
     } else {
       showToast(`El video de ${ch.name} se detuvo; vuelve a sintonizar el canal.`);
     }
-  }, 5000);
+  }, 3000);
 
   const playRelayMode = () => {
     if (usedRelay || !ch.relayUrl || currentGen !== liveSessionGen) return;
@@ -4676,6 +4698,12 @@ function openVodPlayer(item, startTime = 0, session = vodSession) {
 
     video.addEventListener('canplay', safePlay, { once: true });
     video.addEventListener('loadeddata', safePlay, { once: true });
+    const vodKick = () => {
+      if (vodSession !== session || session.controller.signal.aborted || video.paused) return;
+      video.play().catch(() => {});
+    };
+    video.addEventListener('stalled', vodKick);
+    video.addEventListener('waiting', () => setTimeout(vodKick, 1500));
 
     const isM3u8 = /\.m3u8(?:[?#]|$)/i.test(item.streamUrl);
 

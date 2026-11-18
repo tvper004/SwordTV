@@ -4,8 +4,9 @@ import Network
 /// Lightweight local HTTP engine on 127.0.0.1:11472 mirroring V2 engine_server.js + proxy.js.
 final class LocalEngineServer {
     struct MediaTarget {
-        let url: String
-        let headers: [String: String]
+        var url: String
+        var headers: [String: String]
+        let channelCode: String?
     }
 
     private let portal: PortalClient
@@ -57,10 +58,10 @@ final class LocalEngineServer {
         listener = nil
     }
 
-    private func registerMedia(url: String, headers: [String: String]) -> String {
+    private func registerMedia(url: String, headers: [String: String], channelCode: String? = nil) -> String {
         let tok = UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased().prefix(24)
         tokenLock.lock()
-        tokens[String(tok)] = MediaTarget(url: url, headers: headers)
+        tokens[String(tok)] = MediaTarget(url: url, headers: headers, channelCode: channelCode)
         tokenLock.unlock()
         return String(tok)
     }
@@ -107,7 +108,7 @@ final class LocalEngineServer {
             case "/api/live/resolve":
                 let code = query["code"] ?? query["channelCode"] ?? ""
                 let res = try portal.resolveLive(channelCode: code)
-                let tok = registerMedia(url: res.url, headers: res.headers)
+                let tok = registerMedia(url: res.url, headers: res.headers, channelCode: code)
                 sendJson(conn, 200, ["ok": true, "name": res.name, "streamUrl": "http://127.0.0.1:\(port)/media/\(tok)/stream.m3u8", "mime": "application/x-mpegurl"])
             case "/api/live/proxy":
                 let rawUrl = query["url"] ?? ""
@@ -266,11 +267,16 @@ final class LocalEngineServer {
         func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
             if isHls {
                 let raw = String(data: hlsBuffer, encoding: .utf8) ?? ""
-                let body = Data(rewriteHls(raw, token, responseUrl ?? URL(string: isHlsCheckUrl)!).utf8)
-                let hdr = "HTTP/1.1 \(statusCode) OK\r\nContent-Type: application/vnd.apple.mpegurl\r\nContent-Length: \(body.count)\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\nConnection: close\r\n\r\n"
-                var payload = Data(hdr.utf8)
-                payload.append(body)
-                conn.send(content: payload, completion: .contentProcessed { _ in self.conn.cancel() })
+                if error != nil || statusCode >= 400 || raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    let hdr = "HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\nConnection: close\r\n\r\n"
+                    conn.send(content: Data(hdr.utf8), completion: .contentProcessed { _ in self.conn.cancel() })
+                } else {
+                    let body = Data(rewriteHls(raw, token, responseUrl ?? URL(string: isHlsCheckUrl)!).utf8)
+                    let hdr = "HTTP/1.1 \(statusCode) OK\r\nContent-Type: application/vnd.apple.mpegurl\r\nContent-Length: \(body.count)\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\nConnection: close\r\n\r\n"
+                    var payload = Data(hdr.utf8)
+                    payload.append(body)
+                    conn.send(content: payload, completion: .contentProcessed { _ in self.conn.cancel() })
+                }
             } else {
                 if !headersSent {
                     let hdr = "HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n"
@@ -364,9 +370,14 @@ final class LocalEngineServer {
         if let range { req.setValue(range, forHTTPHeaderField: "Range") }
         let delegate = StreamRelayDelegate(conn: conn, urlStr: urlStr, token: token, rewriteHls: self.rewriteHls)
         let cfg = URLSessionConfiguration.ephemeral
-        cfg.timeoutIntervalForRequest = 20
+        cfg.timeoutIntervalForRequest = 15
+        cfg.waitsForConnectivity = true
         let streamSession = URLSession(configuration: cfg, delegate: delegate, delegateQueue: nil)
-        streamSession.dataTask(with: req).resume()
+        let task = streamSession.dataTask(with: req)
+        conn.stateUpdateHandler = { state in
+            if case .cancelled = state { task.cancel() }
+        }
+        task.resume()
     }
 
     private func rewriteHls(_ content: String, token: String, parent: URL) -> String {
