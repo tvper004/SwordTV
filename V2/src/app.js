@@ -1570,10 +1570,42 @@ function setupVideoPlayers() {
     liveVideo.currentTime = Math.min(liveVideo.duration || Infinity, liveVideo.currentTime + 10);
   });
 
-  // Settings button
-  document.getElementById('live-settings-btn')?.addEventListener('click', () => {
+  // Stream Settings Menu & Compact Icon Mode
+  const liveSettingsBtn = document.getElementById('live-settings-btn');
+  const liveSettingsMenu = document.getElementById('live-settings-menu');
+  const liveCompactToggle = document.getElementById('live-compact-toggle');
+  const liveOpenSettings = document.getElementById('live-open-settings');
+  const npBanner = document.getElementById('now-playing-banner');
+  const npCompactBtn = document.getElementById('np-compact-settings-btn');
+
+  const applyCompactStreamBar = (compact) => {
+    if (npBanner) npBanner.classList.toggle('is-compact', !!compact);
+    if (liveCompactToggle) {
+      liveCompactToggle.textContent = compact ? '✓ Solo icono (datos ocultos)' : 'Modo compacto (solo icono)';
+      liveCompactToggle.classList.toggle('selected', !!compact);
+    }
+  };
+  applyCompactStreamBar(localStorage.getItem('swordtv_compact_stream_bar') === '1');
+
+  liveSettingsBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('live-subs-menu')?.classList.remove('active');
+    document.getElementById('live-audio-menu')?.classList.remove('active');
+    liveSettingsMenu?.classList.toggle('active');
+  });
+  liveCompactToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const next = !(npBanner?.classList.contains('is-compact'));
+    localStorage.setItem('swordtv_compact_stream_bar', next ? '1' : '0');
+    applyCompactStreamBar(next);
+    liveSettingsMenu?.classList.remove('active');
+  });
+  liveOpenSettings?.addEventListener('click', () => {
+    liveSettingsMenu?.classList.remove('active');
     switchCategory('settings');
   });
+  npCompactBtn?.addEventListener('click', () => switchCategory('settings'));
+  document.addEventListener('click', () => liveSettingsMenu?.classList.remove('active'));
 
   // Window Controls
   document.getElementById('win-min-btn')?.addEventListener('click', () => {

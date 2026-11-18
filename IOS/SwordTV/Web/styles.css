@@ -2520,6 +2520,27 @@ html.player-fullscreen #vod-player-overlay .player-osd.visible {
 }
 #live-subs-menu { right: 180px; }
 #live-audio-menu { right: 110px; }
+#live-settings-menu { right: 56px; min-width: 210px; }
+.np-compact-settings-btn { display: none; }
+.now-playing-banner.is-compact {
+  padding: 6px 10px;
+  width: fit-content;
+  align-self: flex-end;
+  gap: 8px;
+}
+.now-playing-banner.is-compact .now-playing-left,
+.now-playing-banner.is-compact .tech-pill {
+  display: none !important;
+}
+.now-playing-banner.is-compact .np-compact-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 10px;
+}
 #vod-subs-menu { right: 190px; }
 #vod-audio-menu { right: 120px; }
 .track-selector-menu.active {
