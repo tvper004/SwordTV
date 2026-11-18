@@ -1,0 +1,116 @@
+{
+  "metas": [
+    {
+      "id": "esp:movie:dune2",
+      "name": "Dune: Parte Dos (Dune: Part Two)",
+      "type": "movie",
+      "poster": "https://images.metahub.space/poster/medium/tt15239678/img",
+      "background": "https://images.metahub.space/background/medium/tt15239678/img",
+      "description": "Paul Atreides se une a Chani y a los Fremen mientras busca venganza contra los conspiradores que destruyeron a su familia.",
+      "genres": [
+        "Acci\u00f3n",
+        "Aventura",
+        "Ciencia Ficci\u00f3n"
+      ],
+      "releaseInfo": "2024"
+    },
+    {
+      "id": "esp:movie:deadpool3",
+      "name": "Deadpool & Wolverine",
+      "type": "movie",
+      "poster": "https://images.metahub.space/poster/medium/tt6263850/img",
+      "background": "https://images.metahub.space/background/medium/tt6263850/img",
+      "description": "Wade Wilson se une a un reacio Wolverine en una misi\u00f3n que cambiar\u00e1 la historia del Universo Cinematogr\u00e1fico de Marvel.",
+      "genres": [
+        "Acci\u00f3n",
+        "Comedia",
+        "Ciencia Ficci\u00f3n"
+      ],
+      "releaseInfo": "2024"
+    },
+    {
+      "id": "esp:movie:insideout2",
+      "name": "Intensamente 2 (Inside Out 2)",
+      "type": "movie",
+      "poster": "https://images.metahub.space/poster/medium/tt22022452/img",
+      "background": "https://images.metahub.space/background/medium/tt22022452/img",
+      "description": "Riley entra a la adolescencia y el Cuartel General sufre una demolici\u00f3n repentina para hacer espacio a nuevas emociones.",
+      "genres": [
+        "Animaci\u00f3n",
+        "Aventura",
+        "Comedia"
+      ],
+      "releaseInfo": "2024"
+    },
+    {
+      "id": "esp:movie:heron",
+      "name": "El Ni\u00f1o y la Garza (The Boy and the Heron)",
+      "type": "movie",
+      "poster": "https://images.metahub.space/poster/medium/tt6587046/img",
+      "background": "https://images.metahub.space/background/medium/tt6587046/img",
+      "description": "Obra maestra de Hayao Miyazaki y Studio Ghibli. Mahito entra en un mundo m\u00e1gico guiado por una garza parlante.",
+      "genres": [
+        "Animaci\u00f3n",
+        "Aventura",
+        "Fantas\u00eda"
+      ],
+      "releaseInfo": "2023"
+    },
+    {
+      "id": "esp:movie:suzume",
+      "name": "Suzume",
+      "type": "movie",
+      "poster": "https://images.metahub.space/poster/medium/tt16428256/img",
+      "background": "https://images.metahub.space/background/medium/tt16428256/img",
+      "description": "Suzume, una chica de 17 a\u00f1os, ayuda a un misterioso joven a cerrar puertas que desatan desastres en todo Jap\u00f3n.",
+      "genres": [
+        "Animaci\u00f3n",
+        "Aventura",
+        "Fantas\u00eda"
+      ],
+      "releaseInfo": "2022"
+    },
+    {
+      "id": "esp:movie:oppenheimer",
+      "name": "Oppenheimer",
+      "type": "movie",
+      "poster": "https://images.metahub.space/poster/medium/tt15398776/img",
+      "background": "https://images.metahub.space/background/medium/tt15398776/img",
+      "description": "La historia del f\u00edsico J. Robert Oppenheimer y su papel en el Proyecto Manhattan para desarrollar la bomba at\u00f3mica.",
+      "genres": [
+        "Biograf\u00eda",
+        "Drama",
+        "Historia"
+      ],
+      "releaseInfo": "2023"
+    },
+    {
+      "id": "esp:movie:mario",
+      "name": "Super Mario Bros: La Pel\u00edcula",
+      "type": "movie",
+      "poster": "https://images.metahub.space/poster/medium/tt6718170/img",
+      "background": "https://images.metahub.space/background/medium/tt6718170/img",
+      "description": "Mario y su hermano Luigi viajan a trav\u00e9s de un laberinto subterr\u00e1neo para salvar al Reino Champi\u00f1\u00f3n de Bowser.",
+      "genres": [
+        "Animaci\u00f3n",
+        "Aventura",
+        "Comedia"
+      ],
+      "releaseInfo": "2023"
+    },
+    {
+      "id": "esp:movie:spiderman",
+      "name": "Spider-Man: A Trav\u00e9s del Spider-Verso",
+      "type": "movie",
+      "poster": "https://images.metahub.space/poster/medium/tt9362722/img",
+      "background": "https://images.metahub.space/background/medium/tt9362722/img",
+      "description": "Miles Morales es catapultado a trav\u00e9s del Multiverso donde se encuentra con un equipo de Spider-Personas.",
+      "genres": [
+        "Animaci\u00f3n",
+        "Acci\u00f3n",
+        "Aventura"
+      ],
+      "releaseInfo": "2023"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "esp:movie:heron",
+    "name": "El Ni\u00f1o y la Garza (The Boy and the Heron)",
+    "type": "movie",
+    "poster": "https://images.metahub.space/poster/medium/tt6587046/img",
+    "background": "https://images.metahub.space/background/medium/tt6587046/img",
+    "description": "Obra maestra de Hayao Miyazaki y Studio Ghibli. Mahito entra en un mundo m\u00e1gico guiado por una garza parlante.",
+    "genres": [
+      "Animaci\u00f3n",
+      "Aventura",
+      "Fantas\u00eda"
+    ],
+    "releaseInfo": "2023"
+  }
+}

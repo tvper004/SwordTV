@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "esp:movie:insideout2",
+    "name": "Intensamente 2 (Inside Out 2)",
+    "type": "movie",
+    "poster": "https://images.metahub.space/poster/medium/tt22022452/img",
+    "background": "https://images.metahub.space/background/medium/tt22022452/img",
+    "description": "Riley entra a la adolescencia y el Cuartel General sufre una demolici\u00f3n repentina para hacer espacio a nuevas emociones.",
+    "genres": [
+      "Animaci\u00f3n",
+      "Aventura",
+      "Comedia"
+    ],
+    "releaseInfo": "2024"
+  }
+}

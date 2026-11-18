@@ -1,0 +1,29 @@
+# macOS & OS files
+.DS_Store
+*.swp
+*.swo
+
+# Build artifacts & caches
+**/src-tauri/target/
+**/build/
+**/node_modules/
+stremio_engine/stremio-cache/
+**/stremio-cache/
+*.dSYM/
+*.log
+swordtv_debug.log
+BKP/
+SwordTV.app/
+V1/SwordTV.app/
+scratch/
+
+# Local IDE / SDK / Secrets
+.env
+.env.*
+*.key
+**/local.properties
+.gradle/
+.idea/
+*.iml
+xcuserdata/
+DerivedData/

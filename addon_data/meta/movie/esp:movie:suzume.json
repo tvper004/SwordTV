@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "esp:movie:suzume",
+    "name": "Suzume",
+    "type": "movie",
+    "poster": "https://images.metahub.space/poster/medium/tt16428256/img",
+    "background": "https://images.metahub.space/background/medium/tt16428256/img",
+    "description": "Suzume, una chica de 17 a\u00f1os, ayuda a un misterioso joven a cerrar puertas que desatan desastres en todo Jap\u00f3n.",
+    "genres": [
+      "Animaci\u00f3n",
+      "Aventura",
+      "Fantas\u00eda"
+    ],
+    "releaseInfo": "2022"
+  }
+}

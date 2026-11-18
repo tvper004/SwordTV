@@ -1,0 +1,102 @@
+{
+  "meta": {
+    "id": "esp:anime:chainsawman",
+    "name": "Chainsaw Man",
+    "type": "anime",
+    "poster": "https://images.metahub.space/poster/medium/tt13616990/img",
+    "background": "https://images.metahub.space/background/medium/tt13616990/img",
+    "description": "Denji resucita como el Hombre Motosierra fusion\u00e1ndose con su demonio mascota Pochita. Audio en espa\u00f1ol y subtitulado.",
+    "genres": [
+      "Acci\u00f3n",
+      "Sobrenatural"
+    ],
+    "releaseInfo": "2022",
+    "episodes": 12,
+    "videos": [
+      {
+        "id": "esp:anime:chainsawman:1:1",
+        "title": "Cap\u00edtulo 1",
+        "season": 1,
+        "episode": 1,
+        "released": "2024-01-01"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:2",
+        "title": "Cap\u00edtulo 2",
+        "season": 1,
+        "episode": 2,
+        "released": "2024-01-02"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:3",
+        "title": "Cap\u00edtulo 3",
+        "season": 1,
+        "episode": 3,
+        "released": "2024-01-03"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:4",
+        "title": "Cap\u00edtulo 4",
+        "season": 1,
+        "episode": 4,
+        "released": "2024-01-04"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:5",
+        "title": "Cap\u00edtulo 5",
+        "season": 1,
+        "episode": 5,
+        "released": "2024-01-05"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:6",
+        "title": "Cap\u00edtulo 6",
+        "season": 1,
+        "episode": 6,
+        "released": "2024-01-06"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:7",
+        "title": "Cap\u00edtulo 7",
+        "season": 1,
+        "episode": 7,
+        "released": "2024-01-07"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:8",
+        "title": "Cap\u00edtulo 8",
+        "season": 1,
+        "episode": 8,
+        "released": "2024-01-08"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:9",
+        "title": "Cap\u00edtulo 9",
+        "season": 1,
+        "episode": 9,
+        "released": "2024-01-09"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:10",
+        "title": "Cap\u00edtulo 10",
+        "season": 1,
+        "episode": 10,
+        "released": "2024-01-10"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:11",
+        "title": "Cap\u00edtulo 11",
+        "season": 1,
+        "episode": 11,
+        "released": "2024-01-11"
+      },
+      {
+        "id": "esp:anime:chainsawman:1:12",
+        "title": "Cap\u00edtulo 12",
+        "season": 1,
+        "episode": 12,
+        "released": "2024-01-12"
+      }
+    ]
+  }
+}

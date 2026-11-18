@@ -1,0 +1,182 @@
+{
+  "metas": [
+    {
+      "id": "esp:anime:kimetsu",
+      "name": "Demon Slayer (Kimetsu no Yaiba)",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt9335498/img",
+      "background": "https://images.metahub.space/background/medium/tt9335498/img",
+      "description": "Tanjiro Kamado emprende un peligroso viaje como cazador de demonios para vengar a su familia y curar a su hermana Nezuko.",
+      "genres": [
+        "Acci\u00f3n",
+        "Fantas\u00eda",
+        "Shounen"
+      ],
+      "releaseInfo": "2019-2024",
+      "episodes": 26
+    },
+    {
+      "id": "esp:anime:shingeki",
+      "name": "Attack on Titan (Shingeki no Kyojin)",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt2560140/img",
+      "background": "https://images.metahub.space/background/medium/tt2560140/img",
+      "description": "Eren Jaeger jura exterminar a todos los titanes tras la ca\u00edda del Muro Mar\u00eda. Temporadas completas en espa\u00f1ol.",
+      "genres": [
+        "Acci\u00f3n",
+        "Aventura",
+        "Shounen"
+      ],
+      "releaseInfo": "2013-2023",
+      "episodes": 25
+    },
+    {
+      "id": "esp:anime:jujutsu",
+      "name": "Jujutsu Kaisen",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt12343534/img",
+      "background": "https://images.metahub.space/background/medium/tt12343534/img",
+      "description": "Yuji Itadori traga un dedo maldito y se une a la Escuela de Hechicer\u00eda de Tokio. Temporadas 1 y 2 con audio latino y subt\u00edtulos.",
+      "genres": [
+        "Acci\u00f3n",
+        "Sobrenatural",
+        "Shounen"
+      ],
+      "releaseInfo": "2020-2024",
+      "episodes": 24
+    },
+    {
+      "id": "esp:anime:sololeveling",
+      "name": "Solo Leveling (Ore dake Level Up na Ken)",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt21209876/img",
+      "background": "https://images.metahub.space/background/medium/tt21209876/img",
+      "description": "Sung Jin-woo, el cazador m\u00e1s d\u00e9bil de la humanidad, despierta una misteriosa interfaz que le permite subir de nivel infinitamente.",
+      "genres": [
+        "Acci\u00f3n",
+        "Fantas\u00eda",
+        "Aventura"
+      ],
+      "releaseInfo": "2024",
+      "episodes": 12
+    },
+    {
+      "id": "esp:anime:onepiece",
+      "name": "One Piece",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt0388629/img",
+      "background": "https://images.metahub.space/background/medium/tt0388629/img",
+      "description": "Monkey D. Luffy y los Piratas de Sombrero de Paja navegan en busca del tesoro definitivo: el One Piece.",
+      "genres": [
+        "Aventura",
+        "Acci\u00f3n",
+        "Fantas\u00eda"
+      ],
+      "releaseInfo": "1999-",
+      "episodes": 30
+    },
+    {
+      "id": "esp:anime:dragonball",
+      "name": "Dragon Ball Super",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt4644488/img",
+      "background": "https://images.metahub.space/background/medium/tt4644488/img",
+      "description": "Goku y Vegeta enfrentan a los dioses de la destrucci\u00f3n y guerreros de todos los universos en el Torneo del Poder.",
+      "genres": [
+        "Acci\u00f3n",
+        "Aventura",
+        "Shounen"
+      ],
+      "releaseInfo": "2015-2018",
+      "episodes": 26
+    },
+    {
+      "id": "esp:anime:chainsawman",
+      "name": "Chainsaw Man",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt13616990/img",
+      "background": "https://images.metahub.space/background/medium/tt13616990/img",
+      "description": "Denji resucita como el Hombre Motosierra fusion\u00e1ndose con su demonio mascota Pochita. Audio en espa\u00f1ol y subtitulado.",
+      "genres": [
+        "Acci\u00f3n",
+        "Sobrenatural"
+      ],
+      "releaseInfo": "2022",
+      "episodes": 12
+    },
+    {
+      "id": "esp:anime:frieren",
+      "name": "Frieren: Beyond Journey",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt22064048/img",
+      "background": "https://images.metahub.space/background/medium/tt22064048/img",
+      "description": "Tras derrotar al Rey Demonio, la elfa Frieren emprende un viaje para comprender las ef\u00edmeras vidas humanas y sus sentimientos.",
+      "genres": [
+        "Fantas\u00eda",
+        "Aventura",
+        "Drama"
+      ],
+      "releaseInfo": "2023-2024",
+      "episodes": 28
+    },
+    {
+      "id": "esp:anime:spyxfamily",
+      "name": "Spy x Family",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt13706018/img",
+      "background": "https://images.metahub.space/background/medium/tt13706018/img",
+      "description": "Un esp\u00eda, una asesina y una tel\u00e9pata fingen ser una familia com\u00fan para mantener la paz mundial.",
+      "genres": [
+        "Comedia",
+        "Acci\u00f3n"
+      ],
+      "releaseInfo": "2022-2024",
+      "episodes": 25
+    },
+    {
+      "id": "esp:anime:deathnote",
+      "name": "Death Note",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt0877057/img",
+      "background": "https://images.metahub.space/background/medium/tt0877057/img",
+      "description": "Light Yagami encuentra un cuaderno sobrenatural que mata a cualquiera cuyo nombre se escriba en \u00e9l.",
+      "genres": [
+        "Sobrenatural",
+        "Drama",
+        "Misterio"
+      ],
+      "releaseInfo": "2006-2007",
+      "episodes": 37
+    },
+    {
+      "id": "esp:anime:naruto",
+      "name": "Naruto Shippuden",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt0988824/img",
+      "background": "https://images.metahub.space/background/medium/tt0988824/img",
+      "description": "Naruto Uzumaki regresa a la Aldea de la Hoja tras su entrenamiento con Jiraiya para enfrentar a Akatsuki.",
+      "genres": [
+        "Acci\u00f3n",
+        "Aventura",
+        "Shounen"
+      ],
+      "releaseInfo": "2007-2017",
+      "episodes": 30
+    },
+    {
+      "id": "esp:anime:heroaca",
+      "name": "My Hero Academia (Boku no Hero Academia)",
+      "type": "anime",
+      "poster": "https://images.metahub.space/poster/medium/tt5626028/img",
+      "background": "https://images.metahub.space/background/medium/tt5626028/img",
+      "description": "Izuku Midoriya hereda el don One For All del legendario All Might para convertirse en el mayor h\u00e9roe.",
+      "genres": [
+        "Acci\u00f3n",
+        "Superh\u00e9roes",
+        "Shounen"
+      ],
+      "releaseInfo": "2016-2024",
+      "episodes": 25
+    }
+  ]
+}

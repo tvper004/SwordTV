@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "id": "esp:series:lastofus",
+    "name": "The Last of Us",
+    "type": "series",
+    "poster": "https://images.metahub.space/poster/medium/tt3581920/img",
+    "background": "https://images.metahub.space/background/medium/tt3581920/img",
+    "description": "Joel es contratado para sacar de contrabando a Ellie, una ni\u00f1a de 14 a\u00f1os, fuera de una opresiva zona de cuarentena postapocal\u00edptica.",
+    "genres": [
+      "Acci\u00f3n",
+      "Drama",
+      "Aventura"
+    ],
+    "releaseInfo": "2023-",
+    "episodes": 9,
+    "videos": [
+      {
+        "id": "esp:series:lastofus:1:1",
+        "title": "Cap\u00edtulo 1",
+        "season": 1,
+        "episode": 1,
+        "released": "2024-01-01"
+      },
+      {
+        "id": "esp:series:lastofus:1:2",
+        "title": "Cap\u00edtulo 2",
+        "season": 1,
+        "episode": 2,
+        "released": "2024-01-02"
+      },
+      {
+        "id": "esp:series:lastofus:1:3",
+        "title": "Cap\u00edtulo 3",
+        "season": 1,
+        "episode": 3,
+        "released": "2024-01-03"
+      },
+      {
+        "id": "esp:series:lastofus:1:4",
+        "title": "Cap\u00edtulo 4",
+        "season": 1,
+        "episode": 4,
+        "released": "2024-01-04"
+      },
+      {
+        "id": "esp:series:lastofus:1:5",
+        "title": "Cap\u00edtulo 5",
+        "season": 1,
+        "episode": 5,
+        "released": "2024-01-05"
+      },
+      {
+        "id": "esp:series:lastofus:1:6",
+        "title": "Cap\u00edtulo 6",
+        "season": 1,
+        "episode": 6,
+        "released": "2024-01-06"
+      },
+      {
+        "id": "esp:series:lastofus:1:7",
+        "title": "Cap\u00edtulo 7",
+        "season": 1,
+        "episode": 7,
+        "released": "2024-01-07"
+      },
+      {
+        "id": "esp:series:lastofus:1:8",
+        "title": "Cap\u00edtulo 8",
+        "season": 1,
+        "episode": 8,
+        "released": "2024-01-08"
+      },
+      {
+        "id": "esp:series:lastofus:1:9",
+        "title": "Cap\u00edtulo 9",
+        "season": 1,
+        "episode": 9,
+        "released": "2024-01-09"
+      }
+    ]
+  }
+}

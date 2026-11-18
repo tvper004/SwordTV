@@ -1,0 +1,20 @@
+name: SwordTV
+options:
+  bundleIdPrefix: com.swordtv
+targets:
+  SwordTV:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: SwordTV
+        excludes:
+          - Web
+    resources:
+      - path: SwordTV/Web
+        type: folder
+    settings:
+      base:
+        INFOPLIST_FILE: SwordTV/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.swordtv.ios
+        SWIFT_VERSION: "5.0"

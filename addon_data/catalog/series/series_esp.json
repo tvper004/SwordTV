@@ -1,0 +1,186 @@
+{
+  "metas": [
+    {
+      "id": "esp:series:lastofus",
+      "name": "The Last of Us",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt3581920/img",
+      "background": "https://images.metahub.space/background/medium/tt3581920/img",
+      "description": "Joel es contratado para sacar de contrabando a Ellie, una ni\u00f1a de 14 a\u00f1os, fuera de una opresiva zona de cuarentena postapocal\u00edptica.",
+      "genres": [
+        "Acci\u00f3n",
+        "Drama",
+        "Aventura"
+      ],
+      "releaseInfo": "2023-",
+      "episodes": 9
+    },
+    {
+      "id": "esp:series:houseofdragon",
+      "name": "La Casa del Drag\u00f3n (House of the Dragon)",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt11198330/img",
+      "background": "https://images.metahub.space/background/medium/tt11198330/img",
+      "description": "La historia del origen de la Casa Targaryen ambientada 200 a\u00f1os antes de los eventos de Juego de Tronos.",
+      "genres": [
+        "Acci\u00f3n",
+        "Aventura",
+        "Drama",
+        "Fantas\u00eda"
+      ],
+      "releaseInfo": "2022-",
+      "episodes": 10
+    },
+    {
+      "id": "esp:series:fallout",
+      "name": "Fallout",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt12637874/img",
+      "background": "https://images.metahub.space/background/medium/tt12637874/img",
+      "description": "En una versi\u00f3n alternativa del futuro, los sobrevivientes de un apocalipsis nuclear salen de refugios subterr\u00e1neos a un yermo hostil.",
+      "genres": [
+        "Acci\u00f3n",
+        "Aventura",
+        "Ciencia Ficci\u00f3n"
+      ],
+      "releaseInfo": "2024-",
+      "episodes": 8
+    },
+    {
+      "id": "esp:series:strangerthings",
+      "name": "Stranger Things",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt4574334/img",
+      "background": "https://images.metahub.space/background/medium/tt4574334/img",
+      "description": "Cuando un ni\u00f1o desaparece en Hawkins, sus amigos descubren un misterio con fuerzas sobrenaturales.",
+      "genres": [
+        "Drama",
+        "Fantas\u00eda",
+        "Terror"
+      ],
+      "releaseInfo": "2016-2025",
+      "episodes": 8
+    },
+    {
+      "id": "esp:series:breakingbad",
+      "name": "Breaking Bad",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt0903747/img",
+      "background": "https://images.metahub.space/background/medium/tt0903747/img",
+      "description": "Un profesor de qu\u00edmica de secundaria diagnosticado con c\u00e1ncer se asocia con un exalumno para asegurar el futuro de su familia.",
+      "genres": [
+        "Crimen",
+        "Drama",
+        "Suspense"
+      ],
+      "releaseInfo": "2008-2013",
+      "episodes": 7
+    },
+    {
+      "id": "esp:series:theboys",
+      "name": "The Boys",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt1190634/img",
+      "background": "https://images.metahub.space/background/medium/tt1190634/img",
+      "description": "Un grupo de vigilantes se propone derribar a superh\u00e9roes corruptos que abusan de sus superpoderes.",
+      "genres": [
+        "Acci\u00f3n",
+        "Comedia",
+        "Ciencia Ficci\u00f3n"
+      ],
+      "releaseInfo": "2019-",
+      "episodes": 8
+    },
+    {
+      "id": "esp:series:loki",
+      "name": "Loki",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt9140554/img",
+      "background": "https://images.metahub.space/background/medium/tt9140554/img",
+      "description": "El dios del enga\u00f1o Loki es llevado ante la misteriosa Autoridad de Variaci\u00f3n Temporal (TVA).",
+      "genres": [
+        "Acci\u00f3n",
+        "Aventura",
+        "Fantas\u00eda"
+      ],
+      "releaseInfo": "2021-2023",
+      "episodes": 6
+    },
+    {
+      "id": "esp:series:severance",
+      "name": "Severance (Separaci\u00f3n)",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt11280740/img",
+      "background": "https://images.metahub.space/background/medium/tt11280740/img",
+      "description": "Mark lidera un equipo cuyos recuerdos laborales y personales han sido separados quir\u00fargicamente.",
+      "genres": [
+        "Drama",
+        "Misterio",
+        "Ciencia Ficci\u00f3n"
+      ],
+      "releaseInfo": "2022-",
+      "episodes": 9
+    },
+    {
+      "id": "esp:series:wednesday",
+      "name": "Merlina (Wednesday)",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt13443470/img",
+      "background": "https://images.metahub.space/background/medium/tt13443470/img",
+      "description": "Merlina Addams ingresa a la Academia Nevermore donde investiga una ola de asesinatos sobrenaturales.",
+      "genres": [
+        "Comedia",
+        "Crimen",
+        "Fantas\u00eda"
+      ],
+      "releaseInfo": "2022-",
+      "episodes": 8
+    },
+    {
+      "id": "esp:series:shogun",
+      "name": "Sh\u014dgun",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt2788316/img",
+      "background": "https://images.metahub.space/background/medium/tt2788316/img",
+      "description": "En el Jap\u00f3n de 1600, Lord Toranaga lucha por su vida cuando un misterioso barco europeo encalla en su costa.",
+      "genres": [
+        "Aventura",
+        "Drama",
+        "Historia"
+      ],
+      "releaseInfo": "2024",
+      "episodes": 10
+    },
+    {
+      "id": "esp:series:got",
+      "name": "Juego de Tronos (Game of Thrones)",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt0944947/img",
+      "background": "https://images.metahub.space/background/medium/tt0944947/img",
+      "description": "Nueve familias nobles luchan por el control de las tierras de Poniente mientras una antigua amenaza acecha en el norte.",
+      "genres": [
+        "Acci\u00f3n",
+        "Aventura",
+        "Drama",
+        "Fantas\u00eda"
+      ],
+      "releaseInfo": "2011-2019",
+      "episodes": 10
+    },
+    {
+      "id": "esp:series:mandalorian",
+      "name": "The Mandalorian",
+      "type": "series",
+      "poster": "https://images.metahub.space/poster/medium/tt8111088/img",
+      "background": "https://images.metahub.space/background/medium/tt8111088/img",
+      "description": "Los viajes de un cazarrecompensas solitario en los confines exteriores de la galaxia, lejos de la autoridad de la Nueva Rep\u00fablica.",
+      "genres": [
+        "Acci\u00f3n",
+        "Aventura",
+        "Ciencia Ficci\u00f3n"
+      ],
+      "releaseInfo": "2019-",
+      "episodes": 8
+    }
+  ]
+}

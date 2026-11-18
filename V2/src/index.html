@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwordTV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top App Bar (macOS Drag Region & Tools) -->
+  <header class="app-topbar" data-tauri-drag-region>
+    <div class="header-bg-aurora" data-tauri-drag-region></div>
+    <div class="header-bg-posters" data-tauri-drag-region></div>
+    <div class="brand-section">
+      <div class="brand-logo-container" id="brand-logo-btn" title="SwordTV - Motor Sword Wallpaper">
+        <img src="assets/sword_emblem.png" alt="SwordTV Logo">
+      </div>
+      <div class="brand-title">
+        <span class="brand-sword">Sword</span><span class="brand-tv">TV</span>
+      </div>
+    </div>
+
+    <!-- Drag handle fills empty center space for dragging the window on macOS -->
+    <div class="topbar-drag-handle" data-tauri-drag-region></div>
+
+    <!-- Header Actions (Search, Clock, Notification Bell, Window Controls) -->
+    <div class="header-actions">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="global-search-input" class="search-input" placeholder="Buscar canal, peli, serie..." autocomplete="off">
+      </div>
+      <div class="clock-display" id="clock-display">00:00:00</div>
+      <button class="catalog-sync-btn" id="btn-sync-catalog" title="Actualizar catálogo de títulos">
+        <span class="sync-icon" aria-hidden="true">↻</span>
+        <span class="sync-label">Actualizar</span>
+      </button>
+      <div class="notification-bell-btn" id="btn-notification" title="Notificaciones">
+        <span class="bell-icon">🔔</span>
+        <span class="bell-badge">1</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Two-Row Navigation Bar (Categorías en Dos Filas) -->
+  <nav class="nav-two-rows" id="nav-categories-container">
+    <div class="nav-row" id="nav-row-1">
+      <!-- Fila 1: En Vivo, Películas, Series, Anime, Infantil -->
+    </div>
+    <div class="nav-row" id="nav-row-2">
+      <!-- Fila 2: Deportes, Música, Documentales, Favoritos, Configuración -->
+    </div>
+  </nav>
+
+  <!-- Viewport Area -->
+  <main class="main-viewport">
+    
+    <!-- 1. LIVE TV VIEW -->
+    <section id="view-live" class="view-container active">
+      <div class="live-channels-sidebar">
+        <!-- Live Quick Filters (Todos, Favoritos, Recientes) -->
+        <div class="live-filter-tabs">
+          <button class="live-filter-tab active" id="filter-tab-all">⊞ Todos los Canales</button>
+          <button class="live-filter-tab" id="filter-tab-favs">⭐ Favoritos</button>
+          <button class="live-filter-tab" id="filter-tab-recents">🕒 Recientes</button>
+        </div>
+
+        <!-- Sidebar Channel Search & Categories Toggle -->
+        <div class="channel-search-row">
+          <div class="channel-search-box">
+            <span class="channel-search-icon">🔍</span>
+            <input type="text" id="channel-search-input" class="channel-search-input" placeholder="Buscar canal..." autocomplete="off">
+          </div>
+          <button class="channel-filter-toggle-btn" id="channel-cat-toggle-btn" title="Filtrar por categoría">≡</button>
+        </div>
+
+        <!-- Live Subcategories Drawer / Pills (Visible for direct one-click filtering) -->
+        <div class="live-subnav" id="live-subnav-container">
+          <!-- Rendered in app.js -->
+        </div>
+
+        <!-- Channel List -->
+        <div class="channel-list-scroll" id="live-channels-container">
+          <!-- Rendered in app.js -->
+        </div>
+      </div>
+
+      <!-- Main Live Video Pane -->
+      <div class="live-player-pane">
+        <div class="video-player-container" id="live-player-box">
+          <video id="live-video" class="sword-video" playsinline preload="auto"></video>
+          
+          <!-- Idle / Connecting Backdrop Visual (SwordTV Glowing Emblem & Aurora Ribbons) -->
+          <div class="player-idle-backdrop" id="live-player-idle">
+            <div class="idle-emblem-wrap">
+              <div class="idle-sword-halo">
+                <img src="assets/sword_emblem.png" alt="SwordTV">
+              </div>
+              <h1 class="idle-brand-text"><span class="sword-part">Sword</span><span class="tv-part">TV</span></h1>
+            </div>
+          </div>
+
+          <!-- Top-Right Floating Controls (Favorite Heart, Fullscreen, Toggle Sidebar) -->
+          <div class="player-floating-top-right">
+            <button class="floating-ctrl-btn" id="live-float-fav-btn" title="Añadir a favoritos">♡</button>
+            <button class="floating-ctrl-btn" id="live-float-fs-btn" title="Pantalla Completa">⛶</button>
+            <button class="floating-ctrl-btn" id="live-float-sidebar-btn" title="Ocultar/Mostrar lista">◫</button>
+          </div>
+
+          <!-- Autoplay Audio Unlock Banner -->
+          <div class="audio-unlock-banner" id="audio-unlock-banner" style="display: none;">
+            <span>🔊 El audio está silenciado por el sistema.</span>
+            <button class="btn-primary" id="btn-unmute-overlay" style="padding: 6px 14px; font-size: 12px;">Activar Audio</button>
+          </div>
+
+          <!-- OSD Overlay Controls -->
+          <div class="player-osd" id="live-player-osd">
+            <!-- Progress Bar -->
+            <div class="live-progress-container">
+              <div class="live-progress-bar">
+                <div class="live-progress-fill" id="live-progress-fill" style="width: 65%;"></div>
+                <div class="live-progress-thumb" id="live-progress-thumb" style="left: 65%;"></div>
+              </div>
+            </div>
+
+            <!-- OSD Controls Row -->
+            <div class="osd-controls-row">
+              <div class="controls-left">
+                <button class="ctrl-btn play-btn" id="live-play-btn" title="Pausar / Reanudar (Espacio)">⏸</button>
+                <button class="ctrl-btn" id="live-rewind-10" title="Retroceder 10s">↺10</button>
+                <button class="ctrl-btn" id="live-forward-10" title="Adelantar 10s">↻10</button>
+                <div class="volume-slider-group">
+                  <button class="ctrl-btn" id="live-mute-btn" title="Silenciar / Activar">🔊</button>
+                  <input type="range" class="volume-range" id="live-vol-range" min="0" max="1" step="0.05" value="0.9">
+                </div>
+                <div class="live-indicator-badge"><span class="live-dot pulse"></span> EN VIVO</div>
+              </div>
+              <div class="controls-right">
+                <button class="ctrl-btn" id="live-subs-btn" title="Subtítulos (CC)">💬 CC</button>
+                <button class="ctrl-btn" id="live-audio-btn" title="Pistas de Audio / Idioma">🌐 Audio</button>
+                <button class="ctrl-btn" id="live-settings-btn" title="Ajustes">⚙️</button>
+                <button class="ctrl-btn" id="live-pip-btn" title="Picture in Picture">🗗</button>
+                <button class="ctrl-btn" id="live-fs-btn" title="Pantalla Completa">⛶</button>
+              </div>
+            </div>
+
+            <!-- Menús flotantes de Subtítulos y Audio para Live TV -->
+            <div class="track-selector-menu" id="live-subs-menu">
+              <div class="track-menu-header">Subtítulos (CC)</div>
+              <div class="track-menu-empty">Buscando pistas disponibles…</div>
+            </div>
+            <div class="track-selector-menu" id="live-audio-menu">
+              <div class="track-menu-header">Pistas de Audio</div>
+              <div class="track-menu-empty">Buscando pistas disponibles…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lower Now Playing Information Banner (Directly matches the screenshot!) -->
+        <div class="now-playing-banner" id="now-playing-banner">
+          <div class="now-playing-left">
+            <div class="now-playing-logo-badge" id="now-playing-logo">tdp</div>
+            <div class="now-playing-info">
+              <h3 class="now-playing-title" id="now-playing-title">Teledeporte RTVE HD</h3>
+              <p class="now-playing-show" id="now-playing-show">Estudio Estadio y Directos Deportivos</p>
+              <div class="now-playing-status"><span class="live-dot pulse"></span> EN VIVO</div>
+            </div>
+          </div>
+          <div class="now-playing-tags">
+            <span class="tech-pill" id="np-pill-res">1080p</span>
+            <span class="tech-pill" id="np-pill-hd">HD</span>
+            <span class="tech-pill" id="np-pill-audio">🔊 Estéreo</span>
+            <span class="tech-pill" id="np-pill-format">📶 HLS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. MOVIES VIEW -->
+    <section id="view-movies" class="view-container">
+      <div id="movies-hero-container"></div>
+      <div class="section-header">
+        <h2 class="section-title">Catálogo de Películas</h2>
+        <div class="genre-filter-row" id="movies-genres-container"></div>
+      </div>
+      <div class="media-grid" id="movies-grid"></div>
+    </section>
+
+    <!-- 3. SERIES VIEW -->
+    <section id="view-series" class="view-container">
+      <div id="series-hero-container"></div>
+      <div class="section-header">
+        <h2 class="section-title">Series Completas</h2>
+        <div class="genre-filter-row" id="series-genres-container"></div>
+      </div>
+      <div class="media-grid" id="series-grid"></div>
+    </section>
+
+    <!-- 4. ANIME VIEW -->
+    <section id="view-anime" class="view-container">
+      <div id="anime-hero-container"></div>
+      <div class="section-header">
+        <h2 class="section-title">Anime en Español & Japonés Subtitulado</h2>
+        <div class="genre-filter-row" id="anime-genres-container"></div>
+      </div>
+      <div class="media-grid" id="anime-grid"></div>
+    </section>
+
+    <!-- 5. KIDS / INFANTIL VIEW -->
+    <section id="view-kids" class="view-container">
+      <div class="section-header">
+        <h2 class="section-title">Zona Infantil & Familiar 🐥</h2>
+        <div class="genre-filter-row" id="kids-genres-container"></div>
+      </div>
+      <div class="media-grid" id="kids-grid"></div>
+    </section>
+
+    <!-- 6. SPORTS / DEPORTES VIEW -->
+    <section id="view-sports" class="view-container">
+      <div class="section-header">
+        <h2 class="section-title">Partidos y Eventos en Directo ⚽🏎️</h2>
+      </div>
+      <div class="sports-grid" id="sports-matches-container"></div>
+
+      <div class="section-header" style="margin-top: 36px;">
+        <h2 class="section-title">Canales de Deportes 24/7</h2>
+      </div>
+      <div class="media-grid" id="sports-channels-grid"></div>
+    </section>
+
+    <!-- NOVELAS VIEW (COLUMN_CODE_THEME) -->
+    <section id="view-novelas" class="view-container">
+      <div class="hero-banner" id="novelas-hero-banner" style="background-image: linear-gradient(180deg, rgba(8,12,22,0.2) 0%, rgba(8,12,22,0.95) 100%), url('https://images.metahub.space/background/medium/tt1984180/img');">
+        <div class="hero-content">
+          <div class="hero-badge">🌹 Grandes Telenovelas • Éxitos Internacionales</div>
+          <h1 class="hero-title" id="novelas-hero-title">El Sultán</h1>
+          <p class="hero-meta" id="novelas-hero-meta">Turcas • Drama • Histórico • 4 Temporadas • 1080p HD</p>
+          <p class="hero-synopsis" id="novelas-hero-synopsis">
+            La vida del Sultán Solimán el Magnífico y su historia de amor con Hürrem en el esplendor del Imperio Otomano.
+          </p>
+          <div class="hero-actions">
+            <button class="btn-primary" id="hero-novelas-play-btn">▶ Ver Episodio 1</button>
+            <button class="btn-secondary" id="hero-novelas-info-btn">ℹ Lista de Capítulos</button>
+          </div>
+        </div>
+      </div>
+      <div class="section-header">
+        <h2 class="section-title">Telenovelas Turcas, Latinas & Clásicas</h2>
+        <div class="genre-filter-row" id="novelas-genres-container"></div>
+      </div>
+      <div class="media-grid" id="novelas-grid"></div>
+    </section>
+
+    <!-- 4K UHD VIEW (COLUMN_CODE_UHD) -->
+    <section id="view-uhd" class="view-container">
+      <div class="hero-banner" id="uhd-hero-banner" style="background-image: linear-gradient(180deg, rgba(8,12,22,0.2) 0%, rgba(8,12,22,0.95) 100%), url('https://images.metahub.space/background/medium/tt15239678/img');">
+        <div class="hero-content">
+          <div class="hero-badge" style="border-color: #38bdf8; color: #38bdf8;">💎 Sala 4K Ultra HD & HDR Dolby Vision</div>
+          <h1 class="hero-title" id="uhd-hero-title">Dune: Part Two (4K HDR)</h1>
+          <p class="hero-meta" id="uhd-hero-meta">4K UHD • Ciencia Ficción • HDR10 / Dolby Vision • 2024 • ⭐ 8.6</p>
+          <p class="hero-synopsis" id="uhd-hero-synopsis">
+            Paul Atreides se une a Chani y los Fremen en busca de venganza contra los conspiradores que destruyeron a su familia en el planeta desértico Arrakis.
+          </p>
+          <div class="hero-actions">
+            <button class="btn-primary" id="hero-uhd-play-btn">▶ Reproducir en 4K UHD</button>
+            <button class="btn-secondary" id="hero-uhd-info-btn">ℹ Detalles de Calidad</button>
+          </div>
+        </div>
+      </div>
+      <div class="section-header">
+        <h2 class="section-title">Catálogo Maestro en 4K Ultra HD & HDR</h2>
+        <div class="genre-filter-row" id="uhd-genres-container"></div>
+      </div>
+      <div class="media-grid" id="uhd-grid"></div>
+    </section>
+
+    <!-- 7. MUSIC / MUSICA VIEW -->
+    <section id="view-music" class="view-container">
+      <div class="section-header">
+        <h2 class="section-title">Canales de Música & Conciertos 🎵</h2>
+        <div class="genre-filter-row" id="music-genres-container"></div>
+      </div>
+      <div class="media-grid" id="music-grid"></div>
+    </section>
+
+    <!-- 8. DOCS / DOCUMENTALES VIEW -->
+    <section id="view-docs" class="view-container">
+      <div class="section-header">
+        <h2 class="section-title">Documentales, Cultura & Ciencia 📚</h2>
+        <div class="genre-filter-row" id="docs-genres-container"></div>
+      </div>
+      <div class="media-grid" id="docs-grid"></div>
+    </section>
+
+    <!-- 9. FAVORITES & PROFILE VIEW -->
+    <section id="view-favorites" class="view-container">
+      <div class="profile-summary-card">
+        <div class="profile-avatar-circle">
+          <img src="assets/icon.png" alt="SwordTV">
+        </div>
+        <div class="profile-meta">
+          <h2>Mi Espacio & Preferencias</h2>
+          <p>Tus canales y contenidos marcados tienen máxima prioridad y se sitúan siempre en los primeros lugares.</p>
+        </div>
+        <div class="profile-stats">
+          <div class="stat-box">
+            <span class="stat-number" id="stat-fav-channels">0</span>
+            <span class="stat-label">Canales Favoritos</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number" id="stat-fav-vod">0</span>
+            <span class="stat-label">Películas / Series</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number" id="stat-history-count">0</span>
+            <span class="stat-label">Historial Reciente</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="genre-filter-row" style="margin-bottom: 24px;">
+        <button class="filter-pill active" id="fav-tab-all">⭐ Todos los Favoritos</button>
+        <button class="filter-pill" id="fav-tab-channels">📺 Canales Preferidos</button>
+        <button class="filter-pill" id="fav-tab-vod">🎬 Películas y Series</button>
+        <button class="filter-pill" id="fav-tab-history">🕒 Historial y Continuar Viendo</button>
+      </div>
+      <div class="media-grid" id="favorites-grid"></div>
+    </section>
+
+    <!-- 10. SETTINGS / CONFIGURACION VIEW -->
+    <section id="view-settings" class="view-container">
+      <div class="settings-container">
+        <!-- Preferencias Generales -->
+        <div class="settings-group">
+          <h3 class="settings-group-title">⚙️ Preferencias Generales (Activas para Todos los Usuarios)</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Idioma Predeterminado</div>
+              <div class="setting-desc">Español seleccionado como idioma del sistema</div>
+            </div>
+            <select class="select-input" id="setting-language">
+              <option value="es" selected>Español (Predeterminado)</option>
+              <option value="en">English</option>
+              <option value="pt">Português</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <div style="flex: 1;">
+              <div class="setting-label">Aceleración por Hardware (Apple Silicon M4 & Metal 3)</div>
+              <div class="setting-desc">Decodificación nativa VideoToolbox / AVFoundation optimizada para Media Engine en chips Apple Silicon M4 (H.264, HEVC y AV1 por hardware) con renderizado zero-copy acelerado por Metal 3.</div>
+              <div class="hw-chip-badge" id="hw-chip-badge">⚡ Chip Detectado: Apple Silicon M4 (Media Engine Activo • 60 FPS • Metal 3)</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-hw-accel" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Validador de Canales en Vivo -->
+        <div class="settings-group">
+          <h3 class="settings-group-title">⚡ Revisión de canales en vivo</h3>
+          <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div class="setting-label">Filtro de canales sin respuesta</div>
+                <div class="setting-desc">Comprueba cada URL HTTP y, en HLS, consulta el manifiesto y un segmento para mostrar su estado reciente.</div>
+              </div>
+              <div class="channel-validator-status-badge" id="val-badge-status">
+                <span class="live-dot pulse"></span> <span id="val-badge-text">0 canales revisados</span>
+              </div>
+            </div>
+
+            <!-- Stats grid -->
+            <div class="validator-stats-grid">
+              <div class="val-metric-card">
+                <div class="val-metric-num" id="val-metric-total">3,252</div>
+                <div class="val-metric-title">Total en Base de Datos</div>
+              </div>
+              <div class="val-metric-card online">
+                <div class="val-metric-num" id="val-metric-online">0</div>
+                <div class="val-metric-title">Responden</div>
+              </div>
+              <div class="val-metric-card offline">
+                <div class="val-metric-num" id="val-metric-offline">0</div>
+                <div class="val-metric-title">Sin respuesta</div>
+              </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="validator-progress-box" id="validator-progress-box" style="display: none;">
+              <div class="val-progress-bar">
+                <div class="val-progress-fill" id="val-progress-fill" style="width: 0%;"></div>
+              </div>
+              <div class="val-progress-label" id="val-progress-label">Iniciando análisis de señales...</div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="validator-btn-row">
+              <button class="settings-action-btn primary" id="btn-run-validator">
+                <span>⚡</span> Revisar canales ahora
+              </button>
+              <button class="settings-action-btn success" id="btn-toggle-filter-offline">
+                <span id="btn-filter-icon">✅</span> <span id="btn-filter-text">Ocultar Canales Caídos (Activo)</span>
+              </button>
+              <button class="settings-action-btn secondary" id="btn-restore-all-channels">
+                <span>🔄</span> Restaurar Lista Completa
+              </button>
+            </div>
+            <div class="validator-file-hint">
+              Archivo exportado listo para WebOS IPTV Player en: <code>Documentos/ListaActual.m4u</code> y <code>ListaActual.m3u</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reproductor & Calidad -->
+        <div class="settings-group">
+          <h3 class="settings-group-title">📺 Opciones del Reproductor</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Relación de Aspecto Inicial</div>
+              <div class="setting-desc">Formato predeterminado al abrir una transmisión</div>
+            </div>
+            <select class="select-input" id="setting-aspect">
+              <option value="auto" selected>Automático</option>
+              <option value="16:9">16:9 Panorámico</option>
+              <option value="4:3">4:3 Estándar TV</option>
+              <option value="fill">Relleno de Pantalla</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Calidad Preferida de Streaming</div>
+              <div class="setting-desc">Resolución inicial si está disponible en la fuente</div>
+            </div>
+            <select class="select-input" id="setting-quality">
+              <option value="auto">Automática (Adaptativa)</option>
+              <option value="1080p" selected>1080p Full HD</option>
+              <option value="720p">720p HD</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Control Parental -->
+        <div class="settings-group">
+          <h3 class="settings-group-title">🔒 Control Parental</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Bloqueo de Contenido Adulto (+18)</div>
+              <div class="setting-desc">Solicita PIN para ingresar a la sección de adultos</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-parental-toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item" id="parental-pin-row" style="display: none;">
+            <div>
+              <div class="setting-label">PIN de Seguridad (4 dígitos)</div>
+              <div class="setting-desc">PIN actual para desbloquear la categoría</div>
+            </div>
+            <input type="password" maxlength="4" class="search-input" id="setting-parental-pin" value="0000" style="width: 100px; text-align: center; letter-spacing: 4px;">
+          </div>
+        </div>
+
+        <!-- Fuentes IPTV / Listas M3U -->
+        <div class="settings-group">
+          <h3 class="settings-group-title">📡 Gestión de Fuentes IPTV</h3>
+          <div class="setting-item">
+            <div style="flex: 1; margin-right: 16px;">
+              <div class="setting-label">Cargar Lista M3U Externa</div>
+              <div class="setting-desc">Añade canales adicionales mediante URL M3U / M3U8</div>
+              <input type="text" id="m3u-input-url" class="search-input" placeholder="https://ejemplo.com/lista.m3u" style="width: 100%; margin-top: 8px;">
+            </div>
+            <button class="btn-primary" id="btn-load-m3u" style="padding: 10px 20px; font-size: 13px;">Importar</button>
+          </div>
+        </div>
+
+        <!-- Actualización Automática de Catálogo -->
+        <div class="settings-group">
+          <h3 class="settings-group-title">🔄 Catálogo y Actualización Dinámica</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Actualizar Catálogo al Iniciar la App</div>
+              <div class="setting-desc">Sincroniza y descarga automáticamente los últimos títulos y estrenos cada vez que abres la aplicación</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-auto-sync-catalog" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">Estado de la Base de Títulos</div>
+              <div class="setting-desc" id="catalog-sync-status-desc">Cargando estado...</div>
+            </div>
+            <button class="btn-primary" id="btn-settings-sync-catalog" style="padding: 10px 18px; font-size: 13px;">🔄 Sincronizar Ahora</button>
+          </div>
+        </div>
+
+        <!-- Validador de Conectividad y Limpieza de Canales -->
+        <div class="settings-group">
+          <h3 class="settings-group-title">⚡ Validador de Canales y Filtro de Conectividad</h3>
+          <div class="setting-item">
+            <div style="flex: 1;">
+              <div class="setting-label">Limpieza de Señales Inactivas</div>
+              <div class="setting-desc" id="channel-validator-desc">Comprueba la respuesta de la lista HLS y su primer segmento. Los canales sin respuesta se pueden ocultar y revisar de nuevo.</div>
+              <div id="channel-validator-progress" style="margin-top: 8px; font-size: 12px; color: var(--accent-cyan); display: none;"></div>
+            </div>
+            <button class="btn-primary" id="btn-validate-channels" style="padding: 10px 18px; font-size: 13px; background: linear-gradient(135deg, #0284c7, #06b6d4);">⚡ Revisar canales</button>
+          </div>
+        </div>
+
+        <!-- Información -->
+        <div class="settings-group">
+          <h3 class="settings-group-title">ℹ️ Acerca de SwordTV</h3>
+          <div class="setting-item">
+            <div>
+              <div class="setting-label">SwordTV para MacOS · 1.1.4</div>
+              <div class="setting-desc">Desarrollado por: ChOe - Motor Rust y WebKit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- VOD DETAIL MODAL (Movies / Series / Anime) -->
+  <div class="modal-backdrop" id="vod-detail-modal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="modal-close-btn">✕</button>
+      <div class="modal-hero-header" id="modal-hero-header">
+        <div class="modal-hero-overlay"></div>
+        <div class="modal-header-content">
+          <img src="" alt="Póster" class="modal-poster-thumb" id="modal-poster-img">
+          <div>
+            <div class="hero-badges" id="modal-badges-box"></div>
+            <h1 class="hero-title" id="modal-title" style="font-size: 28px; margin-bottom: 8px;">Título</h1>
+            <p style="color: var(--text-muted); font-size: 13px;" id="modal-submeta">2024 • 2h 15m</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="hero-actions" style="margin-bottom: 24px;">
+          <button class="btn-primary" id="modal-play-btn">▶ Reproducir Ahora</button>
+          <button class="btn-secondary" id="modal-fav-btn">⭐ Favorito</button>
+        </div>
+
+        <p class="hero-synopsis" id="modal-synopsis" style="-webkit-line-clamp: unset; font-size: 15px; margin-bottom: 16px;">
+          Sinopsis...
+        </p>
+
+        <div id="modal-cast-info" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;"></div>
+
+        <div class="modal-episodes-section" id="modal-episodes-container" style="display: none;">
+          <h3 style="font-size: 16px; margin-bottom: 12px; color: #fff;">Temporadas y Episodios</h3>
+          <div class="season-tabs" id="modal-season-tabs"></div>
+          <div class="episode-list" id="modal-episode-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STREAM SOURCES SELECTOR MODAL (Stremio Experience) -->
+  <div class="modal-backdrop" id="stremio-sources-modal">
+    <div class="modal-card sources-modal-card">
+      <button class="modal-close-btn" id="sources-modal-close-btn">✕</button>
+      <div class="sources-modal-header">
+        <div class="sources-header-left">
+          <span class="sources-badge">⚡ FUENTES DISPONIBLES EN STREMIO</span>
+          <h2 id="sources-title" class="sources-title">Seleccionar Fuente de Streaming</h2>
+          <p id="sources-subtitle" class="sources-subtitle">Cargando fuentes disponibles...</p>
+        </div>
+        <div class="sources-search-box">
+          <input type="text" id="sources-search-input" placeholder="Buscar título o ID alternativa..." class="sources-input">
+          <button id="sources-search-btn" class="btn-secondary sources-search-action-btn">🔍 Buscar</button>
+        </div>
+      </div>
+      <div class="sources-list-container" id="sources-list-container">
+        <div class="sources-loading-state" id="sources-loading-state">
+          <div class="spinner"></div>
+          <p id="sources-loading-text">Conectando a Stremio y resolviendo fuentes con audio/subtítulos...</p>
+        </div>
+        <div class="sources-list" id="sources-list" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING VOD VIDEO PLAYER OVERLAY -->
+  <div class="modal-backdrop" id="vod-player-overlay">
+    <button class="vod-close-btn" id="vod-player-close-btn" title="Cerrar reproductor">✕</button>
+    <div class="video-player-container">
+      <video id="vod-video" class="sword-video" playsinline></video>
+      <div id="vod-custom-subtitles" class="vod-subtitles-display"></div>
+      <div id="vod-buffering-overlay" class="vod-buffering-overlay" style="display: none;" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <p id="vod-buffering-text">Preparando reproducción…</p>
+        <p id="vod-buffering-elapsed" class="vod-buffering-elapsed" aria-live="off"></p>
+        <div class="vod-buffering-actions">
+          <button id="vod-retry-btn" class="btn-primary">Reintentar</button>
+          <button id="vod-return-btn" class="btn-secondary">Volver al catálogo</button>
+        </div>
+      </div>
+      <div class="player-osd" id="vod-player-osd">
+        <div class="osd-top">
+          <div class="osd-channel-meta">
+            <div class="osd-title-group">
+              <h2 id="vod-osd-title">Reproduciendo...</h2>
+              <p id="vod-osd-subtitle">4K Ultra HD • Español</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="osd-bottom">
+          <div class="progress-container" id="vod-progress-box">
+            <div class="progress-bar-fill" id="vod-progress-fill"></div>
+            <div class="progress-bar-thumb" id="vod-progress-thumb"></div>
+            <div class="progress-tooltip" id="vod-progress-tooltip">00:00</div>
+          </div>
+          <div class="osd-controls-row">
+            <div class="controls-left">
+              <button class="skip-btn" id="vod-skip-back-btn" title="Retroceder 10 segundos (←)">⏪ 10s</button>
+              <button class="ctrl-btn play-btn" id="vod-play-btn">⏸</button>
+              <button class="skip-btn" id="vod-skip-fwd-btn" title="Adelantar 10 segundos (→)">⏩ 10s</button>
+              <div class="volume-slider-group">
+                <button class="ctrl-btn" id="vod-mute-btn">🔊</button>
+                <input type="range" class="volume-range" id="vod-vol-range" min="0" max="1" step="0.05" value="0.9">
+              </div>
+              <span id="vod-time-display" style="font-size: 13px; color: #fff; font-family: var(--font-display);">00:00 / 00:00</span>
+            </div>
+            <div class="controls-right">
+              <button class="ctrl-btn" id="vod-subs-btn" title="Subtítulos (CC)" aria-label="Subtítulos">💬 CC</button>
+              <button class="ctrl-btn" id="vod-audio-btn" title="Pistas de Audio / Idioma" aria-label="Audio">🌐 Audio</button>
+              <button class="ctrl-btn vod-settings-toggle" id="vod-settings-btn" title="Ajustes de reproducción" aria-label="Abrir ajustes de reproducción" aria-expanded="false" aria-controls="vod-settings-panel">⚙</button>
+              <button class="ctrl-btn" id="vod-pip-btn" title="Picture in Picture">🗗</button>
+              <button class="ctrl-btn" id="vod-fs-btn" title="Pantalla Completa">⛶</button>
+            </div>
+          </div>
+
+          <!-- Menús flotantes de Subtítulos y Audio para VOD Player -->
+          <div class="track-selector-menu" id="vod-subs-menu">
+            <div class="track-menu-header">Subtítulos (CC / Traducción)</div>
+            <div class="track-menu-item selected" data-track="-1">Desactivados (Off) <span class="check-icon">✓</span></div>
+            <div class="track-menu-empty">Cargando subtítulos…</div>
+          </div>
+          <div class="track-selector-menu" id="vod-audio-menu">
+            <div class="track-menu-header">Pistas de Audio (Idioma)</div>
+            <div class="track-menu-empty">Comprobando pistas de audio…</div>
+          </div>
+
+          <div class="vod-settings-panel" id="vod-settings-panel" role="region" aria-label="Ajustes de reproducción" aria-hidden="true">
+            <div class="vod-settings-panel-header">
+              <strong>Ajustes de reproducción</strong>
+              <button class="vod-settings-close" id="vod-settings-close" aria-label="Cerrar ajustes">✕</button>
+            </div>
+            <label class="vod-settings-section" for="vod-aspect-btn">Relación de aspecto</label>
+            <button class="pill-select-btn" id="vod-aspect-btn">Aspecto: Auto</button>
+            <section class="vod-settings-section">
+              <h3>Audio disponible</h3>
+              <div class="track-selector-menu" id="vod-settings-audio-menu">
+                <div class="track-menu-header">Pistas de audio</div>
+                <div class="track-menu-empty">Se comprobará al abrir la fuente.</div>
+              </div>
+            </section>
+            <section class="vod-settings-section">
+              <h3>Subtítulos disponibles</h3>
+              <div class="track-selector-menu" id="vod-settings-subs-menu">
+                <div class="track-menu-header">Subtítulos</div>
+                <div class="track-menu-empty">Sin pistas cargadas.</div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESUME PLAYBACK PROMPT MODAL -->
+  <div class="modal-backdrop" id="vod-resume-modal">
+    <div class="modal-card resume-card">
+      <div class="resume-icon-badge">⏱️</div>
+      <h2 class="resume-title" id="resume-modal-title">Continuar Reproducción</h2>
+      <p class="resume-desc" id="resume-modal-desc">
+        ¿Deseas reanudar desde donde lo dejaste o empezar desde el inicio?
+      </p>
+      <div class="resume-meta-box">
+        <span class="resume-time-badge" id="resume-modal-time">00:00</span>
+        <span class="resume-item-badge" id="resume-modal-item-name">Capítulo 1</span>
+      </div>
+      <div class="resume-actions">
+        <button class="btn-primary resume-btn-continue" id="resume-modal-continue-btn">
+          ▶ Continuar Viendo
+        </button>
+        <button class="btn-secondary resume-btn-restart" id="resume-modal-restart-btn">
+          ↺ Reiniciar desde el Inicio
+        </button>
+      </div>
+      <button class="resume-cancel-btn" id="resume-modal-cancel-btn">✕ Cancelar</button>
+    </div>
+  </div>
+
+  <!-- PARENTAL CONTROL PIN MODAL -->
+  <div class="modal-backdrop" id="parental-pin-modal">
+    <div class="modal-card" style="max-width: 420px; padding: 36px 32px; text-align: center;">
+      <div style="font-size: 40px; margin-bottom: 12px;">🔒</div>
+      <h2 style="font-size: 20px; margin-bottom: 8px;">Control Parental Activo</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">
+        Ingresa el PIN de 4 dígitos para acceder al contenido para adultos.
+      </p>
+      <input type="password" maxlength="4" id="parental-pin-verify-input" class="search-input" placeholder="••••" style="width: 140px; text-align: center; font-size: 24px; letter-spacing: 8px; margin: 0 auto 24px; padding: 10px;">
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button class="btn-secondary" id="parental-pin-cancel-btn">Cancelar</button>
+        <button class="btn-primary" id="parental-pin-submit-btn">Desbloquear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-msg" id="toast-notification">Notificación</div>
+
+  <!-- Scripts -->
+  <script src="assets/hls.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

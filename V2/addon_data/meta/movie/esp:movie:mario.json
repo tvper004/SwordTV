@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "esp:movie:mario",
+    "name": "Super Mario Bros: La Pel\u00edcula",
+    "type": "movie",
+    "poster": "https://images.metahub.space/poster/medium/tt6718170/img",
+    "background": "https://images.metahub.space/background/medium/tt6718170/img",
+    "description": "Mario y su hermano Luigi viajan a trav\u00e9s de un laberinto subterr\u00e1neo para salvar al Reino Champi\u00f1\u00f3n de Bowser.",
+    "genres": [
+      "Animaci\u00f3n",
+      "Aventura",
+      "Comedia"
+    ],
+    "releaseInfo": "2023"
+  }
+}

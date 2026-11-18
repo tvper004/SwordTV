@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "esp:movie:oppenheimer",
+    "name": "Oppenheimer",
+    "type": "movie",
+    "poster": "https://images.metahub.space/poster/medium/tt15398776/img",
+    "background": "https://images.metahub.space/background/medium/tt15398776/img",
+    "description": "La historia del f\u00edsico J. Robert Oppenheimer y su papel en el Proyecto Manhattan para desarrollar la bomba at\u00f3mica.",
+    "genres": [
+      "Biograf\u00eda",
+      "Drama",
+      "Historia"
+    ],
+    "releaseInfo": "2023"
+  }
+}

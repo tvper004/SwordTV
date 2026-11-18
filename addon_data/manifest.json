@@ -1,0 +1,38 @@
+{
+  "id": "community.espanol.vod",
+  "version": "1.1.0",
+  "name": "Anime, Series y Pel\u00edculas en Espa\u00f1ol",
+  "description": "Cat\u00e1logo completo de Anime por cap\u00edtulos, Series completas y Pel\u00edculas en Espa\u00f1ol con streaming directo",
+  "logo": "https://i.imgur.com/7N6XGoO.png",
+  "background": "https://i.imgur.com/ym4n96o.png",
+  "resources": [
+    "catalog",
+    "meta",
+    "stream"
+  ],
+  "types": [
+    "anime",
+    "series",
+    "movie"
+  ],
+  "catalogs": [
+    {
+      "type": "anime",
+      "id": "anime_esp",
+      "name": "Anime por Cap\u00edtulos (Espa\u00f1ol)"
+    },
+    {
+      "type": "series",
+      "id": "series_esp",
+      "name": "Series en Espa\u00f1ol (Episodios)"
+    },
+    {
+      "type": "movie",
+      "id": "movies_esp",
+      "name": "Pel\u00edculas en Espa\u00f1ol"
+    }
+  ],
+  "idPrefixes": [
+    "esp:"
+  ]
+}

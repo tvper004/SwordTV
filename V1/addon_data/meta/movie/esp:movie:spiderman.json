@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "esp:movie:spiderman",
+    "name": "Spider-Man: A Trav\u00e9s del Spider-Verso",
+    "type": "movie",
+    "poster": "https://images.metahub.space/poster/medium/tt9362722/img",
+    "background": "https://images.metahub.space/background/medium/tt9362722/img",
+    "description": "Miles Morales es catapultado a trav\u00e9s del Multiverso donde se encuentra con un equipo de Spider-Personas.",
+    "genres": [
+      "Animaci\u00f3n",
+      "Acci\u00f3n",
+      "Aventura"
+    ],
+    "releaseInfo": "2023"
+  }
+}

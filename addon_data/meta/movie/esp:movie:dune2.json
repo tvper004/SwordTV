@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "esp:movie:dune2",
+    "name": "Dune: Parte Dos (Dune: Part Two)",
+    "type": "movie",
+    "poster": "https://images.metahub.space/poster/medium/tt15239678/img",
+    "background": "https://images.metahub.space/background/medium/tt15239678/img",
+    "description": "Paul Atreides se une a Chani y a los Fremen mientras busca venganza contra los conspiradores que destruyeron a su familia.",
+    "genres": [
+      "Acci\u00f3n",
+      "Aventura",
+      "Ciencia Ficci\u00f3n"
+    ],
+    "releaseInfo": "2024"
+  }
+}

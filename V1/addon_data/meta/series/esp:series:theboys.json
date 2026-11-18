@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "id": "esp:series:theboys",
+    "name": "The Boys",
+    "type": "series",
+    "poster": "https://images.metahub.space/poster/medium/tt1190634/img",
+    "background": "https://images.metahub.space/background/medium/tt1190634/img",
+    "description": "Un grupo de vigilantes se propone derribar a superh\u00e9roes corruptos que abusan de sus superpoderes.",
+    "genres": [
+      "Acci\u00f3n",
+      "Comedia",
+      "Ciencia Ficci\u00f3n"
+    ],
+    "releaseInfo": "2019-",
+    "episodes": 8,
+    "videos": [
+      {
+        "id": "esp:series:theboys:1:1",
+        "title": "Cap\u00edtulo 1",
+        "season": 1,
+        "episode": 1,
+        "released": "2024-01-01"
+      },
+      {
+        "id": "esp:series:theboys:1:2",
+        "title": "Cap\u00edtulo 2",
+        "season": 1,
+        "episode": 2,
+        "released": "2024-01-02"
+      },
+      {
+        "id": "esp:series:theboys:1:3",
+        "title": "Cap\u00edtulo 3",
+        "season": 1,
+        "episode": 3,
+        "released": "2024-01-03"
+      },
+      {
+        "id": "esp:series:theboys:1:4",
+        "title": "Cap\u00edtulo 4",
+        "season": 1,
+        "episode": 4,
+        "released": "2024-01-04"
+      },
+      {
+        "id": "esp:series:theboys:1:5",
+        "title": "Cap\u00edtulo 5",
+        "season": 1,
+        "episode": 5,
+        "released": "2024-01-05"
+      },
+      {
+        "id": "esp:series:theboys:1:6",
+        "title": "Cap\u00edtulo 6",
+        "season": 1,
+        "episode": 6,
+        "released": "2024-01-06"
+      },
+      {
+        "id": "esp:series:theboys:1:7",
+        "title": "Cap\u00edtulo 7",
+        "season": 1,
+        "episode": 7,
+        "released": "2024-01-07"
+      },
+      {
+        "id": "esp:series:theboys:1:8",
+        "title": "Cap\u00edtulo 8",
+        "season": 1,
+        "episode": 8,
+        "released": "2024-01-08"
+      }
+    ]
+  }
+}

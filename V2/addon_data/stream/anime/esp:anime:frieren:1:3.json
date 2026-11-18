@@ -1,0 +1,16 @@
+{
+  "streams": [
+    {
+      "title": "\u26a1 [1080p] Streaming Directo - Audio Espa\u00f1ol Latino HD",
+      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    },
+    {
+      "title": "\ud83c\uddef\ud83c\uddf5 [1080p] Audio Original con Subt\u00edtulos en Espa\u00f1ol",
+      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    },
+    {
+      "title": "\ud83c\uddea\ud83c\uddf8 [720p] Streaming Ligero - Castellano HD",
+      "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    }
+  ]
+}

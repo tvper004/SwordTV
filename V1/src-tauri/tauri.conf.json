@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "SwordTV",
+  "version": "1.1.4",
+  "identifier": "com.swordtv.macos",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "SwordTV",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 980,
+        "minHeight": 640,
+        "resizable": true,
+        "fullscreen": false,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "resources": {
+      "../stremio_engine/engine_server.js": "stremio_engine/engine_server.js",
+      "../stremio_engine/magis.js": "stremio_engine/magis.js",
+      "../stremio_engine/proxy.js": "stremio_engine/proxy.js",
+      "../stremio_engine/dnsx.js": "stremio_engine/dnsx.js",
+      "../stremio_engine/tunnel.js": "stremio_engine/tunnel.js",
+      "../stremio_engine/ts-indexer.js": "stremio_engine/ts-indexer.js",
+      "../stremio_engine/ffmpeg-relay.js": "stremio_engine/ffmpeg-relay.js",
+      "../stremio_engine/activity_logger.js": "stremio_engine/activity_logger.js",
+      "../stremio_engine/server.js": "stremio_engine/server.js"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

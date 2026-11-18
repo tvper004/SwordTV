@@ -1,0 +1,222 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000010000000000000001 /* SwordTVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000010000000000000001 /* SwordTVApp.swift */; };
+		A10000020000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000002 /* ContentView.swift */; };
+		A10000030000000000000003 /* PortalClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000030000000000000003 /* PortalClient.swift */; };
+		A10000040000000000000004 /* LocalEngineServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000040000000000000004 /* LocalEngineServer.swift */; };
+		A10000050000000000000005 /* Web in Resources */ = {isa = PBXBuildFile; fileRef = B10000050000000000000005 /* Web */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B10000000000000000000000 /* SwordTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwordTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10000010000000000000001 /* SwordTVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwordTVApp.swift; sourceTree = "<group>"; };
+		B10000020000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B10000030000000000000003 /* PortalClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalClient.swift; sourceTree = "<group>"; };
+		B10000040000000000000004 /* LocalEngineServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalEngineServer.swift; sourceTree = "<group>"; };
+		B10000050000000000000005 /* Web */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Web; sourceTree = "<group>"; };
+		B10000060000000000000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F10000010000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		G10000000000000000000000 = {
+			isa = PBXGroup;
+			children = (
+				G10000010000000000000001 /* SwordTV */,
+				G10000020000000000000002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		G10000010000000000000001 /* SwordTV */ = {
+			isa = PBXGroup;
+			children = (
+				B10000010000000000000001 /* SwordTVApp.swift */,
+				B10000020000000000000002 /* ContentView.swift */,
+				B10000030000000000000003 /* PortalClient.swift */,
+				B10000040000000000000004 /* LocalEngineServer.swift */,
+				B10000050000000000000005 /* Web */,
+				B10000060000000000000006 /* Info.plist */,
+			);
+			path = SwordTV;
+			sourceTree = "<group>";
+		};
+		G10000020000000000000002 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000000 /* SwordTV.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T10000010000000000000001 /* SwordTV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C10000020000000000000002 /* Build configuration list for PBXNativeTarget "SwordTV" */;
+			buildPhases = (
+				S10000010000000000000001 /* Sources */,
+				F10000010000000000000001 /* Frameworks */,
+				R10000010000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwordTV;
+			productName = SwordTV;
+			productReference = B10000000000000000000000 /* SwordTV.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		P10000010000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = C10000010000000000000001 /* Build configuration list for PBXProject "SwordTV" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = es;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				es,
+				Base,
+			);
+			mainGroup = G10000000000000000000000;
+			productRefGroup = G10000020000000000000002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				T10000010000000000000001 /* SwordTV */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		R10000010000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000050000000000000005 /* Web in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		S10000010000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000010000000000000001 /* SwordTVApp.swift in Sources */,
+				A10000020000000000000002 /* ContentView.swift in Sources */,
+				A10000030000000000000003 /* PortalClient.swift in Sources */,
+				A10000040000000000000004 /* LocalEngineServer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		X10000010000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		X10000020000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		X10000030000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				INFOPLIST_FILE = SwordTV/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.swordtv.ios;
+				PRODUCT_NAME = SwordTV;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		X10000040000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				INFOPLIST_FILE = SwordTV/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.swordtv.ios;
+				PRODUCT_NAME = SwordTV;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C10000010000000000000001 /* Build configuration list for PBXProject "SwordTV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				X10000010000000000000001 /* Debug */,
+				X10000020000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C10000020000000000000002 /* Build configuration list for PBXNativeTarget "SwordTV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				X10000030000000000000003 /* Debug */,
+				X10000040000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = P10000010000000000000001 /* Project object */;
+}

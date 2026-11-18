@@ -1,0 +1,215 @@
+{
+  "meta": {
+    "id": "esp:anime:frieren",
+    "name": "Frieren: Beyond Journey",
+    "type": "anime",
+    "poster": "https://images.metahub.space/poster/medium/tt22064048/img",
+    "background": "https://images.metahub.space/background/medium/tt22064048/img",
+    "description": "Tras derrotar al Rey Demonio, la elfa Frieren emprende un viaje para comprender las ef\u00edmeras vidas humanas y sus sentimientos.",
+    "genres": [
+      "Fantas\u00eda",
+      "Aventura",
+      "Drama"
+    ],
+    "releaseInfo": "2023-2024",
+    "episodes": 28,
+    "videos": [
+      {
+        "id": "esp:anime:frieren:1:1",
+        "title": "Cap\u00edtulo 1",
+        "season": 1,
+        "episode": 1,
+        "released": "2024-01-01"
+      },
+      {
+        "id": "esp:anime:frieren:1:2",
+        "title": "Cap\u00edtulo 2",
+        "season": 1,
+        "episode": 2,
+        "released": "2024-01-02"
+      },
+      {
+        "id": "esp:anime:frieren:1:3",
+        "title": "Cap\u00edtulo 3",
+        "season": 1,
+        "episode": 3,
+        "released": "2024-01-03"
+      },
+      {
+        "id": "esp:anime:frieren:1:4",
+        "title": "Cap\u00edtulo 4",
+        "season": 1,
+        "episode": 4,
+        "released": "2024-01-04"
+      },
+      {
+        "id": "esp:anime:frieren:1:5",
+        "title": "Cap\u00edtulo 5",
+        "season": 1,
+        "episode": 5,
+        "released": "2024-01-05"
+      },
+      {
+        "id": "esp:anime:frieren:1:6",
+        "title": "Cap\u00edtulo 6",
+        "season": 1,
+        "episode": 6,
+        "released": "2024-01-06"
+      },
+      {
+        "id": "esp:anime:frieren:1:7",
+        "title": "Cap\u00edtulo 7",
+        "season": 1,
+        "episode": 7,
+        "released": "2024-01-07"
+      },
+      {
+        "id": "esp:anime:frieren:1:8",
+        "title": "Cap\u00edtulo 8",
+        "season": 1,
+        "episode": 8,
+        "released": "2024-01-08"
+      },
+      {
+        "id": "esp:anime:frieren:1:9",
+        "title": "Cap\u00edtulo 9",
+        "season": 1,
+        "episode": 9,
+        "released": "2024-01-09"
+      },
+      {
+        "id": "esp:anime:frieren:1:10",
+        "title": "Cap\u00edtulo 10",
+        "season": 1,
+        "episode": 10,
+        "released": "2024-01-10"
+      },
+      {
+        "id": "esp:anime:frieren:1:11",
+        "title": "Cap\u00edtulo 11",
+        "season": 1,
+        "episode": 11,
+        "released": "2024-01-11"
+      },
+      {
+        "id": "esp:anime:frieren:1:12",
+        "title": "Cap\u00edtulo 12",
+        "season": 1,
+        "episode": 12,
+        "released": "2024-01-12"
+      },
+      {
+        "id": "esp:anime:frieren:1:13",
+        "title": "Cap\u00edtulo 13",
+        "season": 1,
+        "episode": 13,
+        "released": "2024-01-13"
+      },
+      {
+        "id": "esp:anime:frieren:1:14",
+        "title": "Cap\u00edtulo 14",
+        "season": 1,
+        "episode": 14,
+        "released": "2024-01-14"
+      },
+      {
+        "id": "esp:anime:frieren:1:15",
+        "title": "Cap\u00edtulo 15",
+        "season": 1,
+        "episode": 15,
+        "released": "2024-01-15"
+      },
+      {
+        "id": "esp:anime:frieren:1:16",
+        "title": "Cap\u00edtulo 16",
+        "season": 1,
+        "episode": 16,
+        "released": "2024-01-16"
+      },
+      {
+        "id": "esp:anime:frieren:1:17",
+        "title": "Cap\u00edtulo 17",
+        "season": 1,
+        "episode": 17,
+        "released": "2024-01-17"
+      },
+      {
+        "id": "esp:anime:frieren:1:18",
+        "title": "Cap\u00edtulo 18",
+        "season": 1,
+        "episode": 18,
+        "released": "2024-01-18"
+      },
+      {
+        "id": "esp:anime:frieren:1:19",
+        "title": "Cap\u00edtulo 19",
+        "season": 1,
+        "episode": 19,
+        "released": "2024-01-19"
+      },
+      {
+        "id": "esp:anime:frieren:1:20",
+        "title": "Cap\u00edtulo 20",
+        "season": 1,
+        "episode": 20,
+        "released": "2024-01-20"
+      },
+      {
+        "id": "esp:anime:frieren:1:21",
+        "title": "Cap\u00edtulo 21",
+        "season": 1,
+        "episode": 21,
+        "released": "2024-01-21"
+      },
+      {
+        "id": "esp:anime:frieren:1:22",
+        "title": "Cap\u00edtulo 22",
+        "season": 1,
+        "episode": 22,
+        "released": "2024-01-22"
+      },
+      {
+        "id": "esp:anime:frieren:1:23",
+        "title": "Cap\u00edtulo 23",
+        "season": 1,
+        "episode": 23,
+        "released": "2024-01-23"
+      },
+      {
+        "id": "esp:anime:frieren:1:24",
+        "title": "Cap\u00edtulo 24",
+        "season": 1,
+        "episode": 24,
+        "released": "2024-01-24"
+      },
+      {
+        "id": "esp:anime:frieren:1:25",
+        "title": "Cap\u00edtulo 25",
+        "season": 1,
+        "episode": 25,
+        "released": "2024-01-25"
+      },
+      {
+        "id": "esp:anime:frieren:1:26",
+        "title": "Cap\u00edtulo 26",
+        "season": 1,
+        "episode": 26,
+        "released": "2024-01-26"
+      },
+      {
+        "id": "esp:anime:frieren:1:27",
+        "title": "Cap\u00edtulo 27",
+        "season": 1,
+        "episode": 27,
+        "released": "2024-01-27"
+      },
+      {
+        "id": "esp:anime:frieren:1:28",
+        "title": "Cap\u00edtulo 28",
+        "season": 1,
+        "episode": 28,
+        "released": "2024-01-28"
+      }
+    ]
+  }
+}

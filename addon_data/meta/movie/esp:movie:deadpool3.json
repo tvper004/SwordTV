@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "id": "esp:movie:deadpool3",
+    "name": "Deadpool & Wolverine",
+    "type": "movie",
+    "poster": "https://images.metahub.space/poster/medium/tt6263850/img",
+    "background": "https://images.metahub.space/background/medium/tt6263850/img",
+    "description": "Wade Wilson se une a un reacio Wolverine en una misi\u00f3n que cambiar\u00e1 la historia del Universo Cinematogr\u00e1fico de Marvel.",
+    "genres": [
+      "Acci\u00f3n",
+      "Comedia",
+      "Ciencia Ficci\u00f3n"
+    ],
+    "releaseInfo": "2024"
+  }
+}
