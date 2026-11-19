@@ -13,7 +13,7 @@
 
 <br/>
 
-[![Apóyame en Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/TU_CUENTA_KOFI)
+[![Apóyame en Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/robb004)
 
 </div>
 
