@@ -148,4 +148,4 @@ SwordTV/
 
 Si **SwordTV** te resulta útil y quieres apoyar su mantenimiento y nuevas funcionalidades, puedes invitarme un café en Ko-fi:
 
-[![Apóyame en Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/TU_CUENTA_KOFI)
+[![Apóyame en Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/robb004)
